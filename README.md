@@ -1,2 +1,2 @@
-# SVG-to-Bezier
- Convert SVG shape tags to their cubic Bézier equivalent.
+# SVG-to-Bézier
+Convert SVG shape tags to their cubic Bézier equivalent.
