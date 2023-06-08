@@ -2,42 +2,42 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<title>SVG to Bezier - Test</title>
+	<title>SVG to Bezier - Test Suite</title>
 	<script type="module">
 		import { SVGtoBezier } from './../src/svg-to-bezier.js';
 
 		let files = [
-			{ name: 'circle', category: 'Basic Shapes'},
-			{ name: 'ellipse', category: 'Basic Shapes'},
-			{ name: 'polygon', category: 'Basic Shapes'},
-			{ name: 'polyline', category: 'Basic Shapes'},
-			{ name: 'rect', category: 'Basic Shapes'},
-			// { name: 'circle_multi', category: 'Multi-tag Shapes'},
-			// { name: 'ellipse_multi', category: 'Multi-tag Shapes'},
-			// { name: 'polygon_multi', category: 'Multi-tag Shapes'},
-			// { name: 'polyline_multi', category: 'Multi-tag Shapes'},
-			// { name: 'rect_multi', category: 'Multi-tag Shapes'},
-			{ name: 'Path_A', category: 'Basic Path Commands'},
-			{ name: 'Path_A2', category: 'Basic Path Commands'},
-			{ name: 'Path_Ar', category: 'Basic Path Commands'},
-			{ name: 'Path_Ar2', category: 'Basic Path Commands'},
-			{ name: 'Path_C', category: 'Basic Path Commands'},
-			{ name: 'Path_Cr', category: 'Basic Path Commands'},
-			{ name: 'Path_HV', category: 'Basic Path Commands'},
-			{ name: 'Path_HVr', category: 'Basic Path Commands'},
-			{ name: 'Path_L', category: 'Basic Path Commands'},
-			{ name: 'Path_Lr', category: 'Basic Path Commands'},
-			{ name: 'Path_M', category: 'Basic Path Commands'},
-			{ name: 'Path_Mr', category: 'Basic Path Commands'},
-			{ name: 'Path_Q', category: 'Basic Path Commands'},
-			{ name: 'Path_Qr', category: 'Basic Path Commands'},
-			{ name: 'Path_S', category: 'Basic Path Commands'},
-			{ name: 'Path_Sr', category: 'Basic Path Commands'},
-			{ name: 'Path_T', category: 'Basic Path Commands'},
-			{ name: 'Path_Tr', category: 'Basic Path Commands'},
-			{ name: 'Path_compound', category: 'Path: Complex'},
-			// { name: 'broken', category: 'Edge Cases'},
-			// { name: '_blank', category: 'Edge Cases'},
+			{ name: 'shape_circle', category: 'Basic Shapes'},
+			{ name: 'shape_ellipse', category: 'Basic Shapes'},
+			{ name: 'shape_polygon', category: 'Basic Shapes'},
+			{ name: 'shape_polyline', category: 'Basic Shapes'},
+			{ name: 'shape_rect', category: 'Basic Shapes'},
+			{ name: 'shape_circle_multi', category: 'Multi-tag Shapes'},
+			{ name: 'shape_ellipse_multi', category: 'Multi-tag Shapes'},
+			{ name: 'shape_polygon_multi', category: 'Multi-tag Shapes'},
+			{ name: 'shape_polyline_multi', category: 'Multi-tag Shapes'},
+			{ name: 'shape_rect_multi', category: 'Multi-tag Shapes'},
+			{ name: 'path_A', category: 'Path Commands'},
+			{ name: 'path_A2', category: 'Path Commands'},
+			{ name: 'path_Ar', category: 'Path Commands'},
+			{ name: 'path_Ar2', category: 'Path Commands'},
+			{ name: 'path_C', category: 'Path Commands'},
+			{ name: 'path_Cr', category: 'Path Commands'},
+			{ name: 'path_HV', category: 'Path Commands'},
+			{ name: 'path_HVr', category: 'Path Commands'},
+			{ name: 'path_L', category: 'Path Commands'},
+			{ name: 'path_Lr', category: 'Path Commands'},
+			{ name: 'path_M', category: 'Path Commands'},
+			{ name: 'path_Mr', category: 'Path Commands'},
+			{ name: 'path_Q', category: 'Path Commands'},
+			{ name: 'path_Qr', category: 'Path Commands'},
+			{ name: 'path_S', category: 'Path Commands'},
+			{ name: 'path_Sr', category: 'Path Commands'},
+			{ name: 'path_T', category: 'Path Commands'},
+			{ name: 'path_Tr', category: 'Path Commands'},
+			{ name: 'path_compound', category: 'Complex Paths'},
+			{ name: 'error_not_enough_commands', category: 'Edge Cases'},
+			{ name: 'error_blank', category: 'Edge Cases'},
 		];
 
 		let fileContent = {};
@@ -166,7 +166,7 @@
 </head>
 <body>
 	<div id="target">
-		<h1>SVG to Bezier</h1>
+		<h1>SVG to Bezier - test suite</h1>
 
 	</div>
 </body>
