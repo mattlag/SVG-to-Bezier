@@ -12,5 +12,5 @@ export function tagConvertLine(tagData) {
 
 	let bezierPath = [{ x: x1, y: y1 }, false, false, { x: x2, y: y2 }];
 
-	return bezierPath;
+	return [bezierPath];
 }

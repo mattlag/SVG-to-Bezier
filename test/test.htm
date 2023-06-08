@@ -7,47 +7,63 @@
 		import { SVGtoBezier } from './../src/svg-to-bezier.js';
 
 		let files = [
-			{ name: 'Path_A', category: 'Path: Basic'},
-			{ name: 'Path_A2', category: 'Path: Basic'},
-			{ name: 'Path_Ar', category: 'Path: Basic'},
-			{ name: 'Path_Ar2', category: 'Path: Basic'},
-			{ name: 'Path_C', category: 'Path: Basic'},
-			{ name: 'Path_Cr', category: 'Path: Basic'},
-			{ name: 'Path_HV', category: 'Path: Basic'},
-			{ name: 'Path_HVr', category: 'Path: Basic'},
-			{ name: 'Path_L', category: 'Path: Basic'},
-			{ name: 'Path_Lr', category: 'Path: Basic'},
-			{ name: 'Path_M', category: 'Path: Basic'},
-			{ name: 'Path_Mr', category: 'Path: Basic'},
-			{ name: 'Path_Q', category: 'Path: Basic'},
-			{ name: 'Path_Qr', category: 'Path: Basic'},
-			{ name: 'Path_S', category: 'Path: Basic'},
-			{ name: 'Path_Sr', category: 'Path: Basic'},
-			{ name: 'Path_T', category: 'Path: Basic'},
-			{ name: 'Path_Tr', category: 'Path: Basic'},
+			{ name: 'circle', category: 'Basic Shapes'},
+			{ name: 'ellipse', category: 'Basic Shapes'},
+			{ name: 'polygon', category: 'Basic Shapes'},
+			{ name: 'polyline', category: 'Basic Shapes'},
+			{ name: 'rect', category: 'Basic Shapes'},
+			// { name: 'circle_multi', category: 'Multi-tag Shapes'},
+			// { name: 'ellipse_multi', category: 'Multi-tag Shapes'},
+			// { name: 'polygon_multi', category: 'Multi-tag Shapes'},
+			// { name: 'polyline_multi', category: 'Multi-tag Shapes'},
+			// { name: 'rect_multi', category: 'Multi-tag Shapes'},
+			{ name: 'Path_A', category: 'Basic Path Commands'},
+			{ name: 'Path_A2', category: 'Basic Path Commands'},
+			{ name: 'Path_Ar', category: 'Basic Path Commands'},
+			{ name: 'Path_Ar2', category: 'Basic Path Commands'},
+			{ name: 'Path_C', category: 'Basic Path Commands'},
+			{ name: 'Path_Cr', category: 'Basic Path Commands'},
+			{ name: 'Path_HV', category: 'Basic Path Commands'},
+			{ name: 'Path_HVr', category: 'Basic Path Commands'},
+			{ name: 'Path_L', category: 'Basic Path Commands'},
+			{ name: 'Path_Lr', category: 'Basic Path Commands'},
+			{ name: 'Path_M', category: 'Basic Path Commands'},
+			{ name: 'Path_Mr', category: 'Basic Path Commands'},
+			{ name: 'Path_Q', category: 'Basic Path Commands'},
+			{ name: 'Path_Qr', category: 'Basic Path Commands'},
+			{ name: 'Path_S', category: 'Basic Path Commands'},
+			{ name: 'Path_Sr', category: 'Basic Path Commands'},
+			{ name: 'Path_T', category: 'Basic Path Commands'},
+			{ name: 'Path_Tr', category: 'Basic Path Commands'},
 			{ name: 'Path_compound', category: 'Path: Complex'},
+			// { name: 'broken', category: 'Edge Cases'},
+			// { name: '_blank', category: 'Edge Cases'},
 		];
 
-		files = files.reverse();
 		let fileContent = {};
 
 		document.addEventListener('DOMContentLoaded', () =>  {
 			let target = document.getElementById('target');
-			target.innerHTML = '';
+			let currentCategory = false;
 			files.forEach(fileData => {
+				if (currentCategory !== fileData.category) {
+					currentCategory = fileData.category;
+					target.innerHTML += `<h2>${currentCategory}</h2>`;
+				}
 				let fileName = fileData.name;
 				console.log(`Doing file ${fileName}`);
 				target.innerHTML += `
 				<h3>${fileName}</h3>
 					<object id="pre-img-${fileName}" data="${fileName}.svg" type="image/svg+xml"></object>
 					<textarea id="pre-src-${fileName}"></textarea>
-					<canvas id="post-img-${fileName}" class="post-img"></canvas>
+					<canvas id="post-img-${fileName}" class="post-img" height="300" height="300"></canvas>
 					<textarea id="post-src-${fileName}"></textarea>
 				`;
 			});
 
 			files.forEach(fileData => {
 				let fileName = fileData.name;
+
 				document.getElementById(`pre-img-${fileName}`).addEventListener('load', function(){
 					console.log(`\n\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n${fileName}`);
 					console.log(this.contentDocument);
@@ -56,6 +72,7 @@
 						document.getElementById(`pre-src-${fileName}`).innerHTML = preSource;
 						fileContent[fileName] = preSource;
 						let bezierPaths = SVGtoBezier(preSource);
+						console.log(`DRAWING ${bezierPaths.length} PATHS for ${fileName}`);
 						console.log(bezierPaths);
 						drawBeziersToCanvas(bezierPaths, document.getElementById(`post-img-${fileName}`).getContext('2d'));
 						document.getElementById(`post-src-${fileName}`).innerHTML = JSON.stringify(bezierPaths);
@@ -69,7 +86,38 @@
 		});
 
 		function drawBeziersToCanvas(bezierPaths, ctx) {
+			ctx.lineWidth = 1;
+			bezierPaths.forEach(path => {
+				console.log(`starting to draw path`);
+				console.log(path);
+				console.log(path[0]);
+				console.log(path[0][0]);
+				ctx.beginPath();
+				ctx.moveTo(path[0][0].x, path[0][0].y);
+				path.forEach(bezier => {
+					let p0 = bezier[0];
+					let p1 = bezier[1]? bezier[1] : bezier[0];
+					let p2 = bezier[2]? bezier[2] : bezier[3];
+					let p3 = bezier[3];
+					ctx.bezierCurveTo(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
+					drawPoint(p0, ctx);
+					drawPoint(p1, ctx);
+					drawPoint(p2, ctx);
+					drawPoint(p3, ctx);
+				});
+				ctx.strokeStyle = 'rgb(200, 0, 0)';
+				ctx.stroke();
+				ctx.closePath();
+				ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+				ctx.fill();
+			});
+		}
 
+		function drawPoint(point, ctx) {
+			ctx.save();
+			ctx.fillStyle = 'rgb(100, 0, 0)';
+			ctx.fillRect(point.x-2, point.y-2, 4, 4);
+			ctx.restore();
 		}
 	</script>
 	<style>
@@ -87,27 +135,24 @@
 
 		h1, h2, h3 {
 			grid-column: span 2;
-			margin-top: 20px;
+		}
+
+		h2 {
+			border-bottom: 1px solid lightgray;
+			margin-top: 40px;
 		}
 
 		#target {
-			margin: 20px;
 			display: grid;
 			grid-template-columns: 300px 800px;
 			gap: 20px;
 		}
 
-		object, .post-img {
+		object, canvas {
 			border: 1px solid slategray;
 			grid-column: 1;
 			min-height: 300px;
 			min-width: 300px;
-		}
-
-		.post-img {
-			width: 300px;
-			height: 302px;
-			display: inline-block;
 		}
 
 		textarea {
@@ -120,7 +165,9 @@
 	</style>
 </head>
 <body>
-	<h1>SVG to Bezier</h1>
-	<div id="target"></div>
+	<div id="target">
+		<h1>SVG to Bezier</h1>
+
+	</div>
 </body>
 </html>

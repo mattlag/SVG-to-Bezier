@@ -55,28 +55,35 @@ function convertTags(tagData) {
 	if (!tagData?.content) return [];
 
 	tagData.content.forEach((tag) => {
-		console.log(`Starting conversion for ${tag.name}`)
+		console.log(`Starting conversion for ${tag.name} - result.length = ${result.length}`);
 		if (
 			tag.name.toLowerCase() === 'circle' ||
 			tag.name.toLowerCase() === 'ellipse'
 		) {
+			console.log(`MATCHED ${tag.name.toLowerCase()} as CIRCLE or ELLIPSE`);
 			result = result.concat(tagConvertCircleEllipse(tag));
 		}
 		if (tag.name.toLowerCase() === 'path') {
+			console.log(`MATCHED ${tag.name.toLowerCase()} as PATH`);
 			result = result.concat(tagConvertPath(tag));
 		}
 		if (
 			tag.name.toLowerCase() === 'polygon' ||
 			tag.name.toLowerCase() === 'polyline'
 		) {
+			console.log(`MATCHED ${tag.name.toLowerCase()} as POLYGON or POLYLINE`);
 			result = result.concat(tagConvertPolygonPolyline(tag));
 		}
 		if (tag.name.toLowerCase() === 'rect') {
+			console.log(`MATCHED ${tag.name.toLowerCase()} as RECT`);
 			result = result.concat(tagConvertRect(tag));
 		}
 		if (tag.name.toLowerCase() === 'g') {
+			console.log(`MATCHED ${tag.name.toLowerCase()} as G`);
 			result = result.concat(convertTags(tag.content));
 		}
+
+		console.log(`END for ${tag.name} - result.length = ${result.length}`);
 	});
 
 	return result;

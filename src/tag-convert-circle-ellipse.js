@@ -4,8 +4,8 @@
  * @returns {Array} - resulting path(s) in Bezier Data Format
  */
 export function tagConvertCircleEllipse(tagData) {
-	let bezierPaths = [];
-	data = tagData?.attributes || {};
+	let bezierPath = [];
+	let data = tagData?.attributes || {};
 
 	let rx = Number(data.r) || Number(data.rx) || 100;
 	rx = Math.abs(rx);
@@ -22,10 +22,10 @@ export function tagConvertCircleEllipse(tagData) {
 			yMax: cy + ry,
 		};
 
-		bezierPaths = ovalPathFromMaxes(ellipseMaxes);
+		bezierPath = ovalPathFromMaxes(ellipseMaxes);
 	}
 
-	return bezierPaths;
+	return [bezierPath];
 }
 
 function ovalPathFromMaxes(maxes) {
@@ -55,7 +55,7 @@ function ovalPathFromMaxes(maxes) {
 	// Second Point - Right
 	let Pr = { x: rx, y: by + hh };
 	let H1r = { x: rx, y: ty - hhd };
-	let H2r = { x: rx, y: by - hhd };
+	let H2r = { x: rx, y: by + hhd };
 
 	// Third Point - Bottom
 	let Pb = { x: lx + hw, y: by };
@@ -67,12 +67,12 @@ function ovalPathFromMaxes(maxes) {
 	let H1l = { x: lx, y: by + hhd };
 	let H2l = { x: lx, y: ty - hhd };
 
-	bezierPaths = [
+	let paths = [
 		[Pt, H2t, H1r, Pr],
 		[Pr, H2r, H1b, Pb],
 		[Pb, H2b, H1l, Pl],
 		[Pl, H2l, H1t, Pt],
 	];
 
-	return bezierPaths;
+	return paths;
 }

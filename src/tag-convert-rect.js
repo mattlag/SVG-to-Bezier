@@ -16,12 +16,12 @@ export function tagConvertRect(tagData) {
 	let lowerRight = { x: right, y: bottom };
 	let lowerLeft = { x: x, y: bottom };
 
-	let bezierPaths = [
+	let bezierPath = [
 		[upperLeft, false, false, upperRight],
 		[upperRight, false, false, lowerRight],
 		[lowerRight, false, false, lowerLeft],
 		[lowerLeft, false, false, upperLeft],
 	];
 
-	return bezierPaths;
+	return [bezierPath];
 }

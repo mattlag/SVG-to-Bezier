@@ -35,5 +35,5 @@ export function tagConvertPolygonPolyline(tagData) {
 		}
 	}
 
-	return bezierPath;
+	return [bezierPath];
 }
