@@ -1,8 +1,11 @@
 import {
 	chunkAndValidateParameters,
 	sanitizeParameterData,
-} from './svg-to-bezier';
-import { convertArcToCommandToBezier } from './tag-convert-path-arc';
+} from './svg-to-bezier.js';
+import { convertArcToCommandToBezier } from './tag-convert-path-arc.js';
+
+// Turn logging on/off
+const enableConsoleLogging = true;
 
 /**
  * Converts an SVG Path tag to Bezier Data Format
@@ -10,14 +13,13 @@ import { convertArcToCommandToBezier } from './tag-convert-path-arc';
  * @returns {Array} - resulting path(s) in Bezier Data Format
  */
 export function tagConvertPath(tagData = {}) {
-	log(`\n\n>>>>>>>>>>>>>>>>>>>>>>>\nConvert SVG Path Commands start`);
+	log(`\ntagConvertPath`);
 	const dAttribute = tagData.attributes.d || '';
 	log(`\t dAttribute: ${dAttribute}`);
 
 	// Check for commands
 	if (dAttribute.length === 0 || dAttribute.length === 1) {
-		if (options.returnObject) return { type: 'Z' };
-		else return 'Z';
+		return [];
 	}
 
 	// Take the command string and split into an array containing
@@ -44,7 +46,7 @@ export function tagConvertPath(tagData = {}) {
 	commands = convertQuadraticBeziers(commands);
 
 	// Convert Elliptical Arc commands A to Cubic Bézier commands C
-	if (options.convertArcToCubic) commands = convertArcs(commands);
+	commands = convertArcs(commands);
 
 	// Do the final conversion to Bezier Data format
 	const bezierPaths = convertCommandsToBezierPaths(commands);
@@ -61,7 +63,7 @@ function convertCommandsToBezierPaths(commands) {
 	// At this point:
 	// The only commands should be M, C, L, Z
 	// Commands should not be chained
-	commands.forEach(command => {
+	commands.forEach((command) => {
 		if (command.type === 'M') {
 			currentX = command.parameters[0];
 			currentY = command.parameters[1];
@@ -103,25 +105,25 @@ function convertCommandsToBezierPaths(commands) {
  */
 
 function chunkCommands(dAttribute) {
-	// log(`Start chunkCommands`);
+	log(`Start chunkCommands`);
 	let result = [];
 	let commandStart = false;
 
 	let data = sanitizeParameterData(dAttribute);
-	// log(data);
+	log(data);
 
 	// Find the first valid command
 	for (let j = 0; j < data.length; j++) {
 		if (isCommand(data.charAt(j))) {
 			commandStart = j;
-			// log(`First valid command ${data.charAt(j)} found at ${j}`);
+			log(`First valid command ${data.charAt(j)} found at ${j}`);
 			break;
 		}
 	}
 
 	if (commandStart === false) {
 		// No valid commands found
-		// log(`No valid commands found, returning Z`);
+		log(`No valid commands found, returning Z`);
 		return [{ type: 'Z' }];
 	}
 
@@ -153,7 +155,7 @@ function chunkCommands(dAttribute) {
 }
 
 function convertToAbsolute(commands) {
-	// log(`Start convertToAbsolute: ${commands.length} command chunks`);
+	log(`Start convertToAbsolute: ${commands.length} command chunks`);
 	let result = [];
 	let newCommand = {};
 	let currentPoint = { x: 0, y: 0 };
@@ -287,7 +289,7 @@ function convertToAbsolute(commands) {
 				type: 'A',
 				parameters: [],
 			};
-			// log(`Arc to relative parameters\n${command.parameters}`);
+			log(`Arc to relative parameters\n${command.parameters}`);
 			for (let i = 0; i < command.parameters.length; i += 7) {
 				newCommand.parameters.push(command.parameters[i + 0]);
 				newCommand.parameters.push(command.parameters[i + 1]);
@@ -430,12 +432,12 @@ function splitChainParameters(commands) {
 }
 
 function convertLineTo(commands) {
-	// log(`Start convertLineTo`);
+	log(`Start convertLineTo`);
 	let result = [];
 	let currentPoint = { x: 0, y: 0 };
 
 	commands.forEach((command) => {
-		// log(`doing ${command.type} [${command.parameters.join()}]`);
+		log(`doing ${command.type} [${command.parameters.join()}]`);
 
 		if (command.type === 'H') {
 			for (let p = 0; p < command.parameters.length; p++) {
@@ -455,16 +457,20 @@ function convertLineTo(commands) {
 			result.push(command);
 		}
 
-		// log(`pushed ${result[result.length-1].type} [${result[result.length-1].parameters.join()}]`);
+		log(
+			`pushed ${result[result.length - 1].type} [${result[
+				result.length - 1
+			].parameters.join()}]`
+		);
 		currentPoint = getNewEndPoint(currentPoint, command);
-		// log(`new end point ${currentPoint.x}, ${currentPoint.y}`);
+		log(`new end point ${currentPoint.x}, ${currentPoint.y}`);
 	});
 
 	return result;
 }
 
 function convertSmoothBeziers(commands) {
-	// log(`Start convertSmoothBeziers`);
+	log(`Start convertSmoothBeziers`);
 	let result = [];
 	let currentPoint = { x: 0, y: 0 };
 	let previousHandle = { x: 0, y: 0 };
@@ -589,22 +595,19 @@ function convertArcs(commands) {
 
 				log(`Converted Beziers\n${convertedBeziers}`);
 
-				if (options.splitChains) {
-					for (let i = 0; i < convertedBeziers.length; i += 6) {
-						result.push({
-							type: 'C',
-							parameters: [
-								convertedBeziers[i + 0],
-								convertedBeziers[i + 1],
-								convertedBeziers[i + 2],
-								convertedBeziers[i + 3],
-								convertedBeziers[i + 4],
-								convertedBeziers[i + 5],
-							],
-						});
-					}
-				} else {
-					result.push({ type: 'C', parameters: convertedBeziers });
+				// Split Chains
+				for (let i = 0; i < convertedBeziers.length; i += 6) {
+					result.push({
+						type: 'C',
+						parameters: [
+							convertedBeziers[i + 0],
+							convertedBeziers[i + 1],
+							convertedBeziers[i + 2],
+							convertedBeziers[i + 3],
+							convertedBeziers[i + 4],
+							convertedBeziers[i + 5],
+						],
+					});
 				}
 
 				currentPoint = {
@@ -703,7 +706,11 @@ function getNewEndPoint(currentPoint, command) {
 }
 
 function isCommand(c) {
-	// log(`isCommand passed ${c}`);
+	log(`isCommand passed ${c}`);
 	if ('MmLlCcSsZzHhVvAaQqTt'.indexOf(c) > -1) return true;
 	return false;
+}
+
+function log(message) {
+	if (enableConsoleLogging) console.log(message);
 }

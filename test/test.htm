@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>SVG to Bezier - Test</title>
+	<script type="module">
+		import { SVGtoBezier } from './../src/svg-to-bezier.js';
+
+		let files = [
+			{ name: 'Path_A', category: 'Path: Basic'},
+			{ name: 'Path_A2', category: 'Path: Basic'},
+			{ name: 'Path_Ar', category: 'Path: Basic'},
+			{ name: 'Path_Ar2', category: 'Path: Basic'},
+			{ name: 'Path_C', category: 'Path: Basic'},
+			{ name: 'Path_Cr', category: 'Path: Basic'},
+			{ name: 'Path_HV', category: 'Path: Basic'},
+			{ name: 'Path_HVr', category: 'Path: Basic'},
+			{ name: 'Path_L', category: 'Path: Basic'},
+			{ name: 'Path_Lr', category: 'Path: Basic'},
+			{ name: 'Path_M', category: 'Path: Basic'},
+			{ name: 'Path_Mr', category: 'Path: Basic'},
+			{ name: 'Path_Q', category: 'Path: Basic'},
+			{ name: 'Path_Qr', category: 'Path: Basic'},
+			{ name: 'Path_S', category: 'Path: Basic'},
+			{ name: 'Path_Sr', category: 'Path: Basic'},
+			{ name: 'Path_T', category: 'Path: Basic'},
+			{ name: 'Path_Tr', category: 'Path: Basic'},
+			{ name: 'Path_compound', category: 'Path: Complex'},
+		];
+
+		files = files.reverse();
+		let fileContent = {};
+
+		document.addEventListener('DOMContentLoaded', () =>  {
+			let target = document.getElementById('target');
+			target.innerHTML = '';
+			files.forEach(fileData => {
+				let fileName = fileData.name;
+				console.log(`Doing file ${fileName}`);
+				target.innerHTML += `
+				<h3>${fileName}</h3>
+					<object id="pre-img-${fileName}" data="${fileName}.svg" type="image/svg+xml"></object>
+					<textarea id="pre-src-${fileName}"></textarea>
+					<canvas id="post-img-${fileName}" class="post-img"></canvas>
+					<textarea id="post-src-${fileName}"></textarea>
+				`;
+			});
+
+			files.forEach(fileData => {
+				let fileName = fileData.name;
+				document.getElementById(`pre-img-${fileName}`).addEventListener('load', function(){
+					console.log(`\n\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n${fileName}`);
+					console.log(this.contentDocument);
+					if(this.contentDocument) {
+						let preSource = this.contentDocument.children[0].outerHTML;
+						document.getElementById(`pre-src-${fileName}`).innerHTML = preSource;
+						fileContent[fileName] = preSource;
+						let bezierPaths = SVGtoBezier(preSource);
+						console.log(bezierPaths);
+						drawBeziersToCanvas(bezierPaths, document.getElementById(`post-img-${fileName}`).getContext('2d'));
+						document.getElementById(`post-src-${fileName}`).innerHTML = JSON.stringify(bezierPaths);
+					} else {
+						let message = 'Only works on a server, something like `npx http-server`';
+						document.getElementById('target').innerHTML = message;
+						console.error(message);
+					}
+				}, false);
+			});
+		});
+
+		function drawBeziersToCanvas(bezierPaths, ctx) {
+
+		}
+	</script>
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+			font-weight: normal;
+			font-family: sans-serif;
+		}
+
+		body {
+			padding: 20px;
+		}
+
+		h1, h2, h3 {
+			grid-column: span 2;
+			margin-top: 20px;
+		}
+
+		#target {
+			margin: 20px;
+			display: grid;
+			grid-template-columns: 300px 800px;
+			gap: 20px;
+		}
+
+		object, .post-img {
+			border: 1px solid slategray;
+			grid-column: 1;
+			min-height: 300px;
+			min-width: 300px;
+		}
+
+		.post-img {
+			width: 300px;
+			height: 302px;
+			display: inline-block;
+		}
+
+		textarea {
+			grid-column: 2;
+			height: 302px;
+			width: 800px;
+			font-family: 'Cascadia Code', Consolas, monospace;
+			font-size: 14px;
+		}
+	</style>
+</head>
+<body>
+	<h1>SVG to Bezier</h1>
+	<div id="target"></div>
+</body>
+</html>

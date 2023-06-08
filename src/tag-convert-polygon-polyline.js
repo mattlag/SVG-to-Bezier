@@ -1,7 +1,7 @@
 import {
 	chunkAndValidateParameters,
 	sanitizeParameterData,
-} from './svg-to-bezier';
+} from './svg-to-bezier.js';
 
 /**
  * Converts an SVG Polygon or Polyline tag to Bezier Data Format
@@ -15,8 +15,8 @@ export function tagConvertPolygonPolyline(tagData) {
 	initialData = sanitizeParameterData(initialData);
 	let data = chunkAndValidateParameters(initialData);
 
-	// log('Polyline or Polygon data, cleaned & formatted:');
-	// log(data);
+	// console.log('Polyline or Polygon data, cleaned & formatted:');
+	// console.log(data);
 
 	if (data.length > 4) {
 		let previousX = Number(data[0]);

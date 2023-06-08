@@ -6,15 +6,15 @@
 	"Bezier Data Format"
 
 	- Point
-		{x: Number, y: Number}	// simple x/y object
+		{x: Number, y: Number}            // simple x/y object
 
-	- Single Bezier curve
-		[p0, p1, p2, p3] 				// where each p is a Point
+	- Bezier curve (Collection of 2 or 4 points)
+		[point0, point1, point2, point3]  // 'Regular' Bezier curve notation
 		or
-		[p0, false, false, p3] 	// straight lines have no p1 or p2
+		[point0, false, false, point3]    // straight lines have no point1 or point2
 
-	- Path (collection of Single Bezier curves)
-		[sbc1, sbc2, ...] 			// where p3 of sbc(n) should equal p0 of sbc(n+1)
+	- Path (collection of Bezier curves)
+		[bezier1, bezier2, ...]           // where point3 of bezier(n) should equal point0 of bezier(n+1)
 
 	- Bezier Paths (collection of Paths)
 		[path1, path2, ...]
@@ -23,10 +23,10 @@
 */
 
 import { tagConvertCircleEllipse } from './tag-convert-circle-ellipse.js';
-import { tagConvertPath } from './tag-convert-path.js';
 import { tagConvertPolygonPolyline } from './tag-convert-polygon-polyline.js';
+import { tagConvertPath } from './tag-convert-path.js';
 import { tagConvertRect } from './tag-convert-rect.js';
-import { XMLtoJSON } from './XMLtoJSON.js';
+import { XMLtoJSON } from './xml-to-json.js';
 
 /**
  * Takes an input SVG document in string format, and converts it to
@@ -34,12 +34,13 @@ import { XMLtoJSON } from './XMLtoJSON.js';
  * @param {String} inputSVG - xml svg to convert
  * @returns {Array} - collection of Paths in Bezier Data Format
  */
-export function svgToBezier(inputSVG) {
-	let bezierPaths = [];
+export function SVGtoBezier(inputSVG) {
+	console.log(`\nSVGtoBezier`);
+	console.log(inputSVG);
 	let svgDocumentData = XMLtoJSON(inputSVG);
-
-	bezierPaths = convertTags(svgDocumentData);
-
+	console.log(svgDocumentData);
+	let bezierPaths = convertTags(svgDocumentData);
+	console.log(bezierPaths);
 	return bezierPaths;
 }
 
@@ -54,25 +55,26 @@ function convertTags(tagData) {
 	if (!tagData?.content) return [];
 
 	tagData.content.forEach((tag) => {
+		console.log(`Starting conversion for ${tag.name}`)
 		if (
-			tag.name.toLowerCase === 'circle' ||
-			tag.name.toLowerCase === 'ellipse'
+			tag.name.toLowerCase() === 'circle' ||
+			tag.name.toLowerCase() === 'ellipse'
 		) {
 			result = result.concat(tagConvertCircleEllipse(tag));
 		}
-		if (tag.name.toLowerCase === 'path') {
+		if (tag.name.toLowerCase() === 'path') {
 			result = result.concat(tagConvertPath(tag));
 		}
 		if (
-			tag.name.toLowerCase === 'polygon' ||
-			tag.name.toLowerCase === 'polyline'
+			tag.name.toLowerCase() === 'polygon' ||
+			tag.name.toLowerCase() === 'polyline'
 		) {
 			result = result.concat(tagConvertPolygonPolyline(tag));
 		}
-		if (tag.name.toLowerCase === 'rect') {
+		if (tag.name.toLowerCase() === 'rect') {
 			result = result.concat(tagConvertRect(tag));
 		}
-		if (tag.name.toLowerCase === 'g') {
+		if (tag.name.toLowerCase() === 'g') {
 			result = result.concat(convertTags(tag.content));
 		}
 	});

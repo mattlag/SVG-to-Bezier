@@ -7,8 +7,8 @@ export function tagConvertRect(tagData) {
 	let data = tagData.attributes || {};
 	let x = Number(data.x) || 0;
 	let y = Number(data.y) || 0;
-	let w = Number(data.width) || 0;
-	let h = Number(data.height) || 0;
+	let w = Number(data.width) || 100;
+	let h = Number(data.height) || 100;
 	let right = x + w;
 	let bottom = y + h;
 	let upperLeft = { x: x, y: y };

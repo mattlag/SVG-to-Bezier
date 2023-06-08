@@ -29,14 +29,8 @@ export function convertArcToCommandToBezier(
 	endY,
 	subPath
 ) {
-	// log(`\n convertArcToCommandToBezier - START`);
-
 	let startPoint = { x: startX, y: startY };
 	let endPoint = { x: endX, y: endY };
-
-	// log(`\t startPoint \tx: ${startPoint.x}\ty: ${startPoint.y}`);
-	// log(`\t endPoint \tx: ${endPoint.x}\ty: ${endPoint.y}`);
-	// log(`\t radius \tx: ${radiusX}\ty: ${radiusY}`);
 
 	// Short circuit for straight-line edge cases
 	if ((startX === endX && startY === endY) || !radiusX || !radiusY) {
@@ -199,7 +193,6 @@ export function convertArcToCommandToBezier(
 			}
 		}
 
-		// log(` convertArcToCommandToBezier - END\n\n`);
 		return finalResult;
 	}
 }

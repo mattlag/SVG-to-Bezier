@@ -7,9 +7,9 @@ export function tagConvertCircleEllipse(tagData) {
 	let bezierPaths = [];
 	data = tagData?.attributes || {};
 
-	let rx = Number(data.r) || Number(data.rx) || 0;
+	let rx = Number(data.r) || Number(data.rx) || 100;
 	rx = Math.abs(rx);
-	let ry = Number(data.r) || Number(data.ry) || 0;
+	let ry = Number(data.r) || Number(data.ry) || 100;
 	ry = Math.abs(ry);
 	let cx = Number(data.cx) || 0;
 	let cy = Number(data.cy) || 0;
