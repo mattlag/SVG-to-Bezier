@@ -35,58 +35,111 @@ import { XMLtoJSON } from './xml-to-json.js';
  * @returns {Array} - collection of Paths in Bezier Data Format
  */
 export function SVGtoBezier(inputSVG) {
-	console.log(`\nSVGtoBezier`);
-	console.log(inputSVG);
+	// console.log(`\nSVGtoBezier`);
+	// console.log(inputSVG);
 	let svgDocumentData = XMLtoJSON(inputSVG);
+	console.log(`JSON DATA`);
 	console.log(svgDocumentData);
 	let bezierPaths = convertTags(svgDocumentData);
-	console.log(bezierPaths);
+	// console.log(bezierPaths);
 	return bezierPaths;
 }
 
 /**
  * Recursively look through the SVG data and convert individual tags
  * @param {Object} tagData - XML to JSON format of a SVG Tag, it's attributes, and content
+ * @param {Object} parentTransformData - Object with transforms to apply from parent tag
  * @returns {Array} - collection of Paths in Bezier Data Format
  */
-function convertTags(tagData) {
+function convertTags(tagData, parentTransformData = false) {
+	console.log(`\n\nCONVERT TAGS for ${tagData.name}`);
 	let result = [];
-
+	let transformData = false;
 	if (!tagData?.content) return [];
+	if (tagData.attributes.transform) {
+		console.warn('Transform data is not supported!');
+		// transformData = getTransformData(tagData);
+	}
 
 	tagData.content.forEach((tag) => {
-		console.log(`Starting conversion for ${tag.name} - result.length = ${result.length}`);
+		// console.log(`Starting conversion for ${tag.name} - result.length = ${result.length}`);
 		if (
 			tag.name.toLowerCase() === 'circle' ||
 			tag.name.toLowerCase() === 'ellipse'
 		) {
-			console.log(`MATCHED ${tag.name.toLowerCase()} as CIRCLE or ELLIPSE`);
-			result = result.concat(tagConvertCircleEllipse(tag));
+			// console.log(`MATCHED ${tag.name.toLowerCase()} as CIRCLE or ELLIPSE`);
+			result = result.concat(tagConvertCircleEllipse(tag, transformData));
 		}
 		if (tag.name.toLowerCase() === 'path') {
-			console.log(`MATCHED ${tag.name.toLowerCase()} as PATH`);
-			result = result.concat(tagConvertPath(tag));
+			// console.log(`MATCHED ${tag.name.toLowerCase()} as PATH`);
+			result = result.concat(tagConvertPath(tag, transformData));
 		}
 		if (
 			tag.name.toLowerCase() === 'polygon' ||
 			tag.name.toLowerCase() === 'polyline'
 		) {
-			console.log(`MATCHED ${tag.name.toLowerCase()} as POLYGON or POLYLINE`);
-			result = result.concat(tagConvertPolygonPolyline(tag));
+			// console.log(`MATCHED ${tag.name.toLowerCase()} as POLYGON or POLYLINE`);
+			result = result.concat(tagConvertPolygonPolyline(tag, transformData));
 		}
 		if (tag.name.toLowerCase() === 'rect') {
-			console.log(`MATCHED ${tag.name.toLowerCase()} as RECT`);
-			result = result.concat(tagConvertRect(tag));
+			// console.log(`MATCHED ${tag.name.toLowerCase()} as RECT`);
+			result = result.concat(tagConvertRect(tag, transformData));
 		}
 		if (tag.name.toLowerCase() === 'g') {
-			console.log(`MATCHED ${tag.name.toLowerCase()} as G`);
-			result = result.concat(convertTags(tag.content));
+			// console.log(`MATCHED ${tag.name.toLowerCase()} as G`);
+			result = result.concat(convertTags(tag, transformData));
 		}
 
-		console.log(`END for ${tag.name} - result.length = ${result.length}`);
+		// console.log(`END for ${tag.name} - result.length = ${result.length}`);
 	});
 
 	return result;
+}
+
+export function getTransformData(tag) {
+	/*
+		`transform` attribute
+			matrix(a,b,c,d,e,f)
+			translate(x, y) 	// default (0,0)
+			scale(x, y) 			// if only x, y = x
+			rotate(a, x, y) 	// if no x,y use 0,0
+			skewX(a) 					// degrees horizontal
+			skewY(a) 					// degrees vertical
+
+		`transform-origin` attribute
+			(x, y, z) 						// default to 0,0 - ignore z value
+														// ignore keyword values
+	*/
+
+	// toLowerCase is called to identify these
+	const supported = ['matrix','translate','scale','rotate','skewx','skewy'];
+	let transforms = false;
+
+	if (tag.attributes.transform) {
+		console.log(`Detected transforms`);
+		console.log(tag.attributes.transform);
+		let temp = tag.attributes.transform.replace(',', ' ');
+		temp = temp.toLowerCase();
+		temp = temp.split(')');
+		console.log(temp);
+		transforms = [];
+		temp.forEach((value) => {
+			let data = value.split('(');
+			if (data.length === 2) {
+				data[0] = data[0].trim();
+				data[1] = data[1].trim();
+				if (supported.indexOf(data[0]) > -1) {
+					transforms.push({
+						name: data[0],
+						args: data[1].split(' ')
+					})
+				}
+			}
+		});
+	}
+
+	console.log(transforms);
+	return transforms;
 }
 
 /*
