@@ -39,7 +39,7 @@
 			{ name: 'path_Tr', category: 'Path Commands'},
 			{ name: 'multi_shape_1', category: 'Complex Paths'},
 			{ name: 'multi_shape_2', category: 'Complex Paths'},
-			{ name: 'error_not_enough_commands', category: 'Edge Cases'},
+			// { name: 'error_not_enough_commands', category: 'Edge Cases'},
 			{ name: 'error_blank', category: 'Edge Cases'},
 		];
 
@@ -54,7 +54,7 @@
 					target.innerHTML += `<h2>${currentCategory}</h2>`;
 				}
 				let fileName = fileData.name;
-				console.log(`Doing file ${fileName}`);
+				console.log(`File ${fileName}`);
 				target.innerHTML += `
 				<h3>${fileName}</h3>
 					<object id="pre-img-${fileName}" data="${fileName}.svg" type="image/svg+xml"></object>

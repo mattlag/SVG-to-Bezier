@@ -1,7 +1,7 @@
 /*
 	SVG to Bezier
 	For more details, see: https://github.com/mattlag/SVG-to-Bezier
-	Version: --.--.--
+	Version: 1.0.0
 	
 	=================================================================
 
@@ -30,7 +30,7 @@ import { tagConvertPath } from './tag-convert-path.js';
 import { tagConvertRect } from './tag-convert-rect.js';
 import { XMLtoJSON } from './xml-to-json.js';
 
-const enableConsoleLogging = true;
+const enableConsoleLogging = false;
 
 /**
  * Takes an input SVG document in string format, and converts it to
