@@ -1,7 +1,7 @@
 /*
 	SVG to Bezier
 	For more details, see: https://github.com/mattlag/SVG-to-Bezier
-	Version: --.--.--
+	Version: 1.--.--
 	
 	=================================================================
 
@@ -39,13 +39,14 @@ const enableConsoleLogging = true;
  * @returns {Array} - collection of Paths in Bezier Data Format
  */
 export function SVGtoBezier(inputSVG) {
-	// log(`\nSVGtoBezier`);
-	// log(inputSVG);
+	log(`\n\n========================\nSVGtoBezier`);
+	log(inputSVG);
 	let svgDocumentData = XMLtoJSON(inputSVG);
 	log(`JSON DATA`);
 	log(svgDocumentData);
 	let bezierPaths = convertTags(svgDocumentData);
-	// log(bezierPaths);
+	log(bezierPaths);
+	log(`\nSVGtoBezier\n========================\n\n`);
 	return bezierPaths;
 }
 
@@ -66,35 +67,32 @@ function convertTags(tagData, parentTransformData = false) {
 	}
 
 	tagData.content.forEach((tag) => {
-		// log(`Starting conversion for ${tag.name} - result.length = ${result.length}`);
-		if (
-			tag.name.toLowerCase() === 'circle' ||
-			tag.name.toLowerCase() === 'ellipse'
-		) {
-			// log(`MATCHED ${tag.name.toLowerCase()} as CIRCLE or ELLIPSE`);
+		let name = tag.name.toLowerCase();
+		log(
+			`Starting conversion for ${tag.name} - result.length = ${result.length}`
+		);
+		if (name === 'circle' || name === 'ellipse') {
+			log(`MATCHED ${name} as CIRCLE or ELLIPSE`);
 			result = result.concat(tagConvertCircleEllipse(tag, transformData));
 		}
-		if (tag.name.toLowerCase() === 'path') {
-			// log(`MATCHED ${tag.name.toLowerCase()} as PATH`);
+		if (name === 'path' || name === 'glyph') {
+			log(`MATCHED ${name} as PATH or GLYPH`);
 			result = result.concat(tagConvertPath(tag, transformData));
 		}
-		if (
-			tag.name.toLowerCase() === 'polygon' ||
-			tag.name.toLowerCase() === 'polyline'
-		) {
-			// log(`MATCHED ${tag.name.toLowerCase()} as POLYGON or POLYLINE`);
+		if (name === 'polygon' || name === 'polyline') {
+			log(`MATCHED ${name} as POLYGON or POLYLINE`);
 			result = result.concat(tagConvertPolygonPolyline(tag, transformData));
 		}
-		if (tag.name.toLowerCase() === 'rect') {
-			// log(`MATCHED ${tag.name.toLowerCase()} as RECT`);
+		if (name === 'rect') {
+			log(`MATCHED ${name} as RECT`);
 			result = result.concat(tagConvertRect(tag, transformData));
 		}
-		if (tag.name.toLowerCase() === 'g') {
-			// log(`MATCHED ${tag.name.toLowerCase()} as G`);
+		if (name === 'g') {
+			log(`MATCHED ${name} as G`);
 			result = result.concat(convertTags(tag, transformData));
 		}
 
-		// log(`END for ${tag.name} - result.length = ${result.length}`);
+		log(`END for ${tag.name} - result.length = ${result.length}`);
 	});
 
 	return result;

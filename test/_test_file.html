@@ -57,7 +57,11 @@
 			canvas.style.height = `${clientRects.height}px`;
 			
 			drawBeziersToCanvas(bezierPaths, canvas.getContext('2d'));
-			document.getElementById(`output-code`).innerHTML = JSON.stringify(bezierPaths);
+			let output = JSON.stringify(bezierPaths);
+			output = output.replaceAll('],', '],\n');
+			output = output.replaceAll(']]]', ']\n]]');
+			output = output.replaceAll('[[', '[[\n');
+			document.getElementById(`output-code`).innerHTML = output;
 		}
 
 

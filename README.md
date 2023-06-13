@@ -56,7 +56,7 @@ or straight lines, which have no point1 or point2
 [point0, false, false, point3]
 ```
 
-**Path**: Collection of Bezier curves, where point3 of bezier(n) should equal point0 of bezier(n+1)
+**Path**: Single path, which is a collection of Bezier curves. Where point3 of bezier(n) should equal point0 of bezier(n+1)
 ```
 [bezier1, bezier2, ...]
 ```
@@ -69,33 +69,33 @@ or straight lines, which have no point1 or point2
 So, overall, a collection of 2 paths, each with 2 Bezier curves, may look like this:
 ```
 [
-	[
-		[
-			{x:100, y:100},
-			{x:100, y:200},
-			{x:300, y:300},
-			{x:300, y:400},
-		],
-		[
-			{x:400, y:400},
-			{x:400, y:500},
-			{x:600, y:600},
-			{x:600, y:700},
-		],
-	],
-	[
-		[
-			{x:1100, y:1100},
-			{x:1100, y:1200},
-			{x:1300, y:1300},
-			{x:1300, y:1400},
-		],
-		[
-			{x:1400, y:1400},
-			{x:1400, y:1500},
-			{x:1600, y:1600},
-			{x:1600, y:1700},
-		],
-	],
+  [
+    [
+      {x:100, y:100},
+      {x:100, y:200},
+      {x:300, y:300},
+      {x:300, y:400},
+    ],
+    [
+      {x:400, y:400},
+      {x:400, y:500},
+      {x:600, y:600},
+      {x:600, y:700},
+    ],
+  ],
+  [
+    [
+      {x:1100, y:1100},
+      {x:1100, y:1200},
+      {x:1300, y:1300},
+      {x:1300, y:1400},
+    ],
+    [
+      {x:1400, y:1400},
+      {x:1400, y:1500},
+      {x:1600, y:1600},
+      {x:1600, y:1700},
+    ],
+  ],
 ]
 ```
