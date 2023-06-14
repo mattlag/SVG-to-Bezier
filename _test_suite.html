@@ -4,8 +4,8 @@
 	<meta charset="UTF-8">
 	<title>SVG to Bezier - Test Suite</title>
 	<script type="module">
-		import { SVGtoBezier } from './../src/svg-to-bezier.js';
-		import { drawBeziersToCanvas } from './canvas-drawing.js';
+		import { SVGtoBezier } from './src/svg-to-bezier.js';
+		import { drawBeziersToCanvas } from './test/canvas-drawing.js';
 
 		let files = [
 			{ name: 'transforms_heart', category: 'Transform Attribute'},
@@ -57,7 +57,7 @@
 				console.log(`File ${fileName}`);
 				target.innerHTML += `
 				<h3>${fileName}</h3>
-					<object id="pre-img-${fileName}" data="${fileName}.svg" type="image/svg+xml"></object>
+					<object id="pre-img-${fileName}" data="./test/${fileName}.svg" type="image/svg+xml"></object>
 					<textarea id="pre-src-${fileName}"></textarea>
 					<canvas id="post-img-${fileName}" class="post-img" height="300" height="300"></canvas>
 					<textarea id="post-src-${fileName}"></textarea>
