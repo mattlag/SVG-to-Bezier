@@ -115,6 +115,13 @@ So, overall, a collection of 2 paths, each with 2 Bezier curves, may look like t
 
 # License & Copyright
 
-SVG-to-Bezier is released under a GNU v3 General Public License
-
 Copyright © 2024 Matthew LaGrandeur
+
+Released under [GPL 3.0](https://www.gnu.org/licenses/gpl-3.0-standalone.html)
+
+## Author
+
+| ![Matthew LaGrandeur's picture](https://1.gravatar.com/avatar/f6f7b963adc54db7e713d7bd5f4903ec?s=70) |
+| ---------------------------------------------------------------------------------------------------- |
+| [Matthew LaGrandeur](http://mattlag.com/)                                                            |
+| matt[at]mattlag[dot]com                                                                              |
