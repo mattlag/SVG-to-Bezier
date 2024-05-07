@@ -1,0 +1,10 @@
+<svg viewBox="0 0 30 60" xmlns="http://www.w3.org/2000/svg">
+  <rect x="10" y="10" width="5" height="10" />
+  <!-- rotation is done around the point 0,0 -->
+  <g transform="rotate(45 10 20)">
+    <rect x="10" y="15" width="5" height="10" fill="red" transform="scale(2 1)" />
+  </g>
+  <g transform="scale(2 1)">
+    <rect x="10" y="40" width="5" height="10" fill="green" transform="rotate(45 10 40)" />
+  </g>
+</svg>
