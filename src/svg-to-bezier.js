@@ -63,30 +63,29 @@ export function SVGtoBezier(inputSVG) {
 function convertTags(tagData) {
 	log(`\n\nCONVERT TAGS - START ${tagData.name}`);
 	log(tagData);
+	if (!tagData?.content) return [];
 
 	let result = [];
-	let transformData = false;
-	if (!tagData?.content) return [];
-	if (tagData.attributes.transform) {
-		transformData = getTransformData(tagData);
-	}
+	const transformData = getTransformData(tagData);
 
 	tagData.content.forEach((tag) => {
 		log(`<<<<< tag ${tag.name}`);
 		log(tag);
-		let name = tag.name.toLowerCase();
-		let tagTransforms = getTransformData(tag);
+		const name = tag.name.toLowerCase();
+		const tagTransforms = getTransformData(tag);
 		log(`tagTransforms`);
 		log(tagTransforms);
 
 		if (convert[name]) {
 			log(`\t converting ${tag.name}`);
-			let convertedTag = convert[name](tag);
+			let convertedTag = convert[name](tag)[0];
+			log(`converted tag: \n${JSON.stringify(convertedTag)}`);
 			if (tagTransforms) {
 				log(`\t transforming ${tag.name}`);
-				convertedTag = applyTransformData(convertedTag, tagTransforms);
+				convertedTag = applyTransformData([convertedTag], tagTransforms);
 			}
-			result.push(convertedTag);
+			log(`transformed tag: \n${JSON.stringify(convertedTag)}`);
+			result = result.concat(convertedTag);
 		}
 
 		log(`>>>>> tag ${tag.name}`);
@@ -97,8 +96,10 @@ function convertTags(tagData) {
 		result = applyTransformData(result[0], transformData);
 	}
 
+	log(`RESULT IS`);
+	log(result);
 	log(`CONVERT TAGS - END ${tagData.name}\n\n`);
-	return result;
+	return [result];
 }
 
 const convert = {

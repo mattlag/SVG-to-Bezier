@@ -1,4 +1,6 @@
 export function drawBeziersToCanvas(bezierPaths, ctx) {
+	// console.log(`drawBeziersToCanvas`);
+	// console.log(bezierPaths);
 	ctx.lineWidth = 1;
 	bezierPaths.forEach((path) => {
 		ctx.beginPath();

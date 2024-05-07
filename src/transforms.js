@@ -74,7 +74,7 @@ export function applyTransformData(bezierPaths = [], transformData = []) {
 }
 
 function transformSingleCurve(curve, transformData = []) {
-	log(`transformSingleCurve`);
+	log(`\t\ttransformSingleCurve`);
 	const resultCurve = [];
 	transformData.forEach((transform) => {
 		const args = transform.args;
@@ -84,9 +84,9 @@ function transformSingleCurve(curve, transformData = []) {
 		if (transform.name === 'translate') {
 			const dx = parseFloat(args[0]);
 			const dy = parseFloat(args[1]);
-			log(`translate: ${dx}, ${dy}`);
-			log(`curve[0]: ${curve[0].x}, ${curve[0].y}`);
-			log(`before transform: ${JSON.stringify(curve)}`);
+			log(`\t\ttranslate: ${dx}, ${dy}`);
+			log(`\t\tcurve[0]: ${curve[0].x}, ${curve[0].y}`);
+			log(`\t\tbefore transform: ${JSON.stringify(curve)}`);
 
 			// 0
 			resultCurve[0] = { x: 0, y: 0 };
@@ -115,7 +115,7 @@ function transformSingleCurve(curve, transformData = []) {
 			resultCurve[3] = { x: 0, y: 0 };
 			resultCurve[3].x = parseFloat(curve[3].x) + dx;
 			resultCurve[3].y = parseFloat(curve[3].y) + dy;
-			log(`after transform: ${JSON.stringify(resultCurve)}`);
+			log(`\t\tafter transform: ${JSON.stringify(resultCurve)}`);
 		}
 
 		if (transform.name === 'scale') {

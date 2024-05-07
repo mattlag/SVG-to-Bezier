@@ -8,7 +8,7 @@
 			import { drawBeziersToCanvas } from './test/canvas-drawing.js';
 
 			let enabledTestCategories = {
-				'Basic Shapes': false,
+				'Basic Shapes': true,
 				'Basic Transform': true,
 				'Complex Transforms': true,
 				'Multi-tag Shapes': false,
@@ -24,7 +24,7 @@
 				{ name: 'shape_polyline', category: 'Basic Shapes' },
 				{ name: 'shape_rect', category: 'Basic Shapes' },
 				// { name: 'transform_matrix', category: 'Basic Transform'},
-				{ name: 'transform_translate', category: 'Basic Transform'},
+				{ name: 'transform_translate', category: 'Basic Transform' },
 				// { name: 'transform_scale', category: 'Basic Transform'},
 				// { name: 'transform_rotate', category: 'Basic Transform'},
 				// { name: 'transform_skewx', category: 'Basic Transform'},
@@ -102,6 +102,13 @@
 										preSource;
 									fileContent[fileName] = preSource;
 									let bezierPaths = SVGtoBezier(preSource);
+
+									let codeOutput = JSON.stringify(bezierPaths);
+									codeOutput = codeOutput.replaceAll('],', '],\n');
+									codeOutput = codeOutput.replaceAll('[[[', '[[\n[');
+									codeOutput = codeOutput.replaceAll(']]]', ']\n]]');									
+									document.getElementById(`post-src-${fileName}`).innerHTML = codeOutput;
+
 									console.log(
 										`DRAWING ${bezierPaths.length} PATHS for ${fileName}`
 									);
@@ -112,8 +119,6 @@
 											.getElementById(`post-img-${fileName}`)
 											.getContext('2d')
 									);
-									document.getElementById(`post-src-${fileName}`).innerHTML =
-										JSON.stringify(bezierPaths);
 								} else {
 									let message =
 										'Only works on a server, something like `npx http-server`';
