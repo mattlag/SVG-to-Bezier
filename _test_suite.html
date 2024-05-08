@@ -11,9 +11,10 @@
 				'Basic Shapes': true,
 				'Basic Transform': true,
 				'Complex Transforms': true,
-				'Multi-tag Shapes': false,
+				'Multi-tag Shapes': true,
 				'Path Commands': false,
 				'Complex Paths': false,
+				'Font Glyphs': true,
 				'Edge Cases': false,
 			};
 
@@ -23,7 +24,7 @@
 				{ name: 'shape_polygon', category: 'Basic Shapes' },
 				{ name: 'shape_polyline', category: 'Basic Shapes' },
 				{ name: 'shape_rect', category: 'Basic Shapes' },
-				// { name: 'transform_matrix', category: 'Basic Transform'},
+				{ name: 'transform_matrix', category: 'Basic Transform' },
 				{ name: 'transform_translate', category: 'Basic Transform' },
 				// { name: 'transform_scale', category: 'Basic Transform'},
 				// { name: 'transform_rotate', category: 'Basic Transform'},
@@ -55,6 +56,8 @@
 				{ name: 'path_Sr', category: 'Path Commands' },
 				{ name: 'path_T', category: 'Path Commands' },
 				{ name: 'path_Tr', category: 'Path Commands' },
+				{ name: 'font_libre_caslon_paren', category: 'Font Glyphs' },
+				{ name: 'font_libre_caslon_s', category: 'Font Glyphs' },
 				{ name: 'multi_shape_1', category: 'Complex Paths' },
 				{ name: 'multi_shape_2', category: 'Complex Paths' },
 				{ name: 'multi_shape_3', category: 'Complex Paths' },
@@ -106,8 +109,11 @@
 									let codeOutput = JSON.stringify(bezierPaths);
 									codeOutput = codeOutput.replaceAll('],', '],\n');
 									codeOutput = codeOutput.replaceAll('[[[', '[[\n[');
-									codeOutput = codeOutput.replaceAll(']]]', ']\n]]');									
-									document.getElementById(`post-src-${fileName}`).innerHTML = codeOutput;
+									codeOutput = codeOutput.replaceAll('[[', '[\n[');
+									codeOutput = codeOutput.replaceAll(']]]', ']\n]]');
+									codeOutput = codeOutput.replaceAll(']]', ']\n]');
+									document.getElementById(`post-src-${fileName}`).innerHTML =
+										codeOutput;
 
 									console.log(
 										`DRAWING ${bezierPaths.length} PATHS for ${fileName}`

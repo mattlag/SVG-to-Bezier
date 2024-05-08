@@ -85,7 +85,8 @@ function convertTags(tagData) {
 				convertedTag = applyTransformData([convertedTag], tagTransforms);
 			}
 			log(`transformed tag: \n${JSON.stringify(convertedTag)}`);
-			result = result.concat(convertedTag);
+			// result = result.concat(convertedTag);
+			result.push(convertedTag);
 		}
 
 		log(`>>>>> tag ${tag.name}`);
@@ -99,7 +100,7 @@ function convertTags(tagData) {
 	log(`RESULT IS`);
 	log(result);
 	log(`CONVERT TAGS - END ${tagData.name}\n\n`);
-	return [result];
+	return result;
 }
 
 const convert = {

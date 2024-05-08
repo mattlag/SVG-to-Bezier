@@ -63,7 +63,7 @@ export function applyTransformData(bezierPaths = [], transformData = []) {
 
 		for (let s = 0; s < singlePath.length; s++) {
 			let singleCurve = singlePath[s];
-			resultBezierPaths[p][s] = transformSingleCurve(
+			resultBezierPaths[p][s] = applyTransformDataToCurve(
 				singleCurve,
 				transformData
 			);
@@ -73,66 +73,115 @@ export function applyTransformData(bezierPaths = [], transformData = []) {
 	return resultBezierPaths[0];
 }
 
-function transformSingleCurve(curve, transformData = []) {
-	log(`\t\ttransformSingleCurve`);
-	const resultCurve = [];
-	transformData.forEach((transform) => {
-		const args = transform.args;
-		if (transform.name === 'matrix') {
-		}
-
-		if (transform.name === 'translate') {
-			const dx = parseFloat(args[0]);
-			const dy = parseFloat(args[1]);
-			log(`\t\ttranslate: ${dx}, ${dy}`);
-			log(`\t\tcurve[0]: ${curve[0].x}, ${curve[0].y}`);
-			log(`\t\tbefore transform: ${JSON.stringify(curve)}`);
-
-			// 0
-			resultCurve[0] = { x: 0, y: 0 };
-			resultCurve[0].x = parseFloat(curve[0].x) + dx;
-			resultCurve[0].y = parseFloat(curve[0].y) + dy;
-
-			// 1
-			if (curve[1]) {
-				resultCurve[1] = { x: 0, y: 0 };
-				resultCurve[1].x = parseFloat(curve[1].x) + dx;
-				resultCurve[1].y = parseFloat(curve[1].y) + dy;
-			} else {
-				resultCurve[1] = false;
-			}
-
-			// 2
-			if (curve[2]) {
-				resultCurve[2] = { x: 0, y: 0 };
-				resultCurve[2].x = parseFloat(curve[2].x) + dx;
-				resultCurve[2].y = parseFloat(curve[2].y) + dy;
-			} else {
-				resultCurve[2] = false;
-			}
-
-			// 3
-			resultCurve[3] = { x: 0, y: 0 };
-			resultCurve[3].x = parseFloat(curve[3].x) + dx;
-			resultCurve[3].y = parseFloat(curve[3].y) + dy;
-			log(`\t\tafter transform: ${JSON.stringify(resultCurve)}`);
-		}
-
-		if (transform.name === 'scale') {
-		}
-
-		if (transform.name === 'rotate') {
-		}
-
-		if (transform.name === 'skewx') {
-		}
-
-		if (transform.name === 'skewy') {
+function applyTransformDataToCurve(curve, transformData = []) {
+	log(`\t\tapplyTransformDataToCurve`);
+	let resultCurve = curve;
+	const orderedTransforms = transformData.reverse();
+	orderedTransforms.forEach((oneTransform) => {
+		if (transformCurve[oneTransform.name]) {
+			log(`\t\t${oneTransform.name}`);
+			resultCurve = transformCurve[oneTransform.name](
+				resultCurve,
+				oneTransform.args
+			);
 		}
 	});
 
 	return resultCurve;
 }
+
+const transformCurve = {
+	matrix: matrixTransformCurve,
+	translate: translateTransformCurve,
+	scale: scaleTransformCurve,
+	rotate: rotateTransformCurve,
+	skewx: skewxTransformCurve,
+	skewy: skewyTransformCurve,
+};
+
+function matrixTransformCurve(curve = [], args = []) {
+	while (args.length < 6) args.push(0);
+	const resultCurve = [];
+	const dx = parseFloat(args[0]);
+	const dy = parseFloat(args[1]);
+	log(
+		`\t\tmatrix: ${args[0]}, ${args[1]}, ${args[2]}, ${args[3]}, ${args[4]}, ${args[5]},`
+	);
+	log(`\t\tbefore transform: ${JSON.stringify(curve)}`);
+
+	function calculateNewPoint(oldPoint, matrix) {
+		if (oldPoint === false) return false;
+		const oldX = parseFloat(oldPoint.x);
+		const oldY = parseFloat(oldPoint.y);
+		const newPoint = { x: 0, y: 0 };
+		newPoint.x = 1 * matrix[0] * oldX + 1 * matrix[2] * oldY + 1 * matrix[4];
+		newPoint.y = 1 * matrix[1] * oldX + 1 * matrix[3] * oldY + 1 * matrix[5];
+		return newPoint;
+	}
+
+	// Base point
+	resultCurve[0] = calculateNewPoint(curve[0], args);
+
+	// Base point handle
+	resultCurve[1] = calculateNewPoint(curve[1], args);
+
+	// Destination point handle
+	resultCurve[2] = calculateNewPoint(curve[2], args);
+
+	// Destination point
+	resultCurve[3] = calculateNewPoint(curve[3], args);
+
+	log(`\t\tafter transform: ${JSON.stringify(resultCurve)}`);
+	return resultCurve;
+}
+
+function translateTransformCurve(curve = [], args = {}) {
+	const resultCurve = [];
+	const dx = parseFloat(args[0]);
+	const dy = parseFloat(args[1]);
+	log(`\t\ttranslate: ${dx}, ${dy}`);
+	log(`\t\tcurve[0]: ${curve[0].x}, ${curve[0].y}`);
+	log(`\t\tbefore transform: ${JSON.stringify(curve)}`);
+
+	// Base point
+	resultCurve[0] = { x: 0, y: 0 };
+	resultCurve[0].x = parseFloat(curve[0].x) + dx;
+	resultCurve[0].y = parseFloat(curve[0].y) + dy;
+
+	// Base point handle
+	if (curve[1]) {
+		resultCurve[1] = { x: 0, y: 0 };
+		resultCurve[1].x = parseFloat(curve[1].x) + dx;
+		resultCurve[1].y = parseFloat(curve[1].y) + dy;
+	} else {
+		resultCurve[1] = false;
+	}
+
+	// Destination point handle
+	if (curve[2]) {
+		resultCurve[2] = { x: 0, y: 0 };
+		resultCurve[2].x = parseFloat(curve[2].x) + dx;
+		resultCurve[2].y = parseFloat(curve[2].y) + dy;
+	} else {
+		resultCurve[2] = false;
+	}
+
+	// Destination point
+	resultCurve[3] = { x: 0, y: 0 };
+	resultCurve[3].x = parseFloat(curve[3].x) + dx;
+	resultCurve[3].y = parseFloat(curve[3].y) + dy;
+
+	log(`\t\tafter transform: ${JSON.stringify(resultCurve)}`);
+	return resultCurve;
+}
+
+function scaleTransformCurve(curve = [], args = {}) {}
+
+function rotateTransformCurve(curve = [], args = {}) {}
+
+function skewxTransformCurve(curve = [], args = {}) {}
+
+function skewyTransformCurve(curve = [], args = {}) {}
 
 /*
 	SAMPLE
