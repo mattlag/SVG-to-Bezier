@@ -28,7 +28,8 @@ export function getTransformData(tag) {
 	let transforms = false;
 	if (tag?.attributes?.transform) {
 		// log(`Detected transforms`);
-		let temp = tag.attributes.transform.replace(',', ' ');
+		let temp = tag.attributes.transform.replaceAll(',', ' ');
+		temp = temp.replaceAll('  ', ' ');
 		temp = temp.toLowerCase();
 		temp = temp.split(')');
 		transforms = [];
@@ -47,14 +48,14 @@ export function getTransformData(tag) {
 		});
 	}
 
-	// log(transforms);
+	log(transforms);
 	return transforms;
 }
 
 export function applyTransformData(bezierPaths = [], transformData = []) {
 	log(`applyTransformData`);
 	log(JSON.stringify(bezierPaths));
-	log(`bezierPaths.length ${bezierPaths.length}`);
+	log(transformData);
 	const resultBezierPaths = [];
 
 	for (let p = 0; p < bezierPaths.length; p++) {
@@ -102,34 +103,23 @@ const transformCurve = {
 function matrixTransformCurve(curve = [], args = []) {
 	while (args.length < 6) args.push(0);
 	const resultCurve = [];
-	const dx = parseFloat(args[0]);
-	const dy = parseFloat(args[1]);
-	log(
-		`\t\tmatrix: ${args[0]}, ${args[1]}, ${args[2]}, ${args[3]}, ${args[4]}, ${args[5]},`
-	);
+	log(`\t\tmatrix: ${args.toString()}`);
 	log(`\t\tbefore transform: ${JSON.stringify(curve)}`);
 
-	function calculateNewPoint(oldPoint, matrix) {
+	function calculateNewPoint(oldPoint) {
 		if (oldPoint === false) return false;
 		const oldX = parseFloat(oldPoint.x);
 		const oldY = parseFloat(oldPoint.y);
 		const newPoint = { x: 0, y: 0 };
-		newPoint.x = 1 * matrix[0] * oldX + 1 * matrix[2] * oldY + 1 * matrix[4];
-		newPoint.y = 1 * matrix[1] * oldX + 1 * matrix[3] * oldY + 1 * matrix[5];
+		newPoint.x = 1 * args[0] * oldX + 1 * args[2] * oldY + 1 * args[4];
+		newPoint.y = 1 * args[1] * oldX + 1 * args[3] * oldY + 1 * args[5];
 		return newPoint;
 	}
 
-	// Base point
-	resultCurve[0] = calculateNewPoint(curve[0], args);
-
-	// Base point handle
-	resultCurve[1] = calculateNewPoint(curve[1], args);
-
-	// Destination point handle
-	resultCurve[2] = calculateNewPoint(curve[2], args);
-
-	// Destination point
-	resultCurve[3] = calculateNewPoint(curve[3], args);
+	resultCurve[0] = calculateNewPoint(curve[0]);
+	resultCurve[1] = calculateNewPoint(curve[1]);
+	resultCurve[2] = calculateNewPoint(curve[2]);
+	resultCurve[3] = calculateNewPoint(curve[3]);
 
 	log(`\t\tafter transform: ${JSON.stringify(resultCurve)}`);
 	return resultCurve;
@@ -175,13 +165,37 @@ function translateTransformCurve(curve = [], args = {}) {
 	return resultCurve;
 }
 
-function scaleTransformCurve(curve = [], args = {}) {}
+function scaleTransformCurve(curve = [], args = []) {
+	const scaleX = parseFloat(args[0]);
+	let scaleY = parseFloat(args[1]);
+	if (!scaleY) scaleY = scaleX;
+	const resultCurve = [];
+	log(`\t\tscale args: ${args.toString()}`);
+	log(`\t\tscale validated: ${scaleX}, ${scaleY}`);
+	log(`\t\tbefore transform: ${JSON.stringify(curve)}`);
 
-function rotateTransformCurve(curve = [], args = {}) {}
+	function calculateNewPoint(oldPoint) {
+		if (oldPoint === false) return false;
+		const newPoint = { x: 0, y: 0 };
+		newPoint.x = parseFloat(oldPoint.x) * scaleX;
+		newPoint.y = parseFloat(oldPoint.y) * scaleY;
+		return newPoint;
+	}
 
-function skewxTransformCurve(curve = [], args = {}) {}
+	resultCurve[0] = calculateNewPoint(curve[0]);
+	resultCurve[1] = calculateNewPoint(curve[1]);
+	resultCurve[2] = calculateNewPoint(curve[2]);
+	resultCurve[3] = calculateNewPoint(curve[3]);
 
-function skewyTransformCurve(curve = [], args = {}) {}
+	log(`\t\tafter transform: ${JSON.stringify(resultCurve)}`);
+	return resultCurve;
+}
+
+function rotateTransformCurve(curve = [], args = []) {}
+
+function skewxTransformCurve(curve = [], args = []) {}
+
+function skewyTransformCurve(curve = [], args = []) {}
 
 /*
 	SAMPLE
