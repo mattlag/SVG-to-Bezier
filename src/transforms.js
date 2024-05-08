@@ -101,12 +101,12 @@ const transformCurve = {
 };
 
 function matrixTransformCurve(curve = [], args = []) {
-	while (args.length < 6) args.push(0);
 	const resultCurve = [];
+	while (args.length < 6) args.push(0);
 	log(`\t\tmatrix: ${args.toString()}`);
 	log(`\t\tbefore transform: ${JSON.stringify(curve)}`);
 
-	function calculateNewPoint(oldPoint) {
+	function matrixTransformPoint(oldPoint) {
 		if (oldPoint === false) return false;
 		const oldX = parseFloat(oldPoint.x);
 		const oldY = parseFloat(oldPoint.y);
@@ -116,10 +116,10 @@ function matrixTransformCurve(curve = [], args = []) {
 		return newPoint;
 	}
 
-	resultCurve[0] = calculateNewPoint(curve[0]);
-	resultCurve[1] = calculateNewPoint(curve[1]);
-	resultCurve[2] = calculateNewPoint(curve[2]);
-	resultCurve[3] = calculateNewPoint(curve[3]);
+	resultCurve[0] = matrixTransformPoint(curve[0]);
+	resultCurve[1] = matrixTransformPoint(curve[1]);
+	resultCurve[2] = matrixTransformPoint(curve[2]);
+	resultCurve[3] = matrixTransformPoint(curve[3]);
 
 	log(`\t\tafter transform: ${JSON.stringify(resultCurve)}`);
 	return resultCurve;
@@ -193,9 +193,61 @@ function scaleTransformCurve(curve = [], args = []) {
 
 function rotateTransformCurve(curve = [], args = []) {}
 
-function skewxTransformCurve(curve = [], args = []) {}
+function skewxTransformCurve(curve = [], args = []) {
+	const resultCurve = [];
+	log(`\t\tskewx: ${args.toString()}`);
+	log(`\t\tbefore transform: ${JSON.stringify(curve)}`);
+	const radians = (Math.PI / 180) * parseFloat(args[0]);
+	const yMultiplier = Math.tan(radians);
 
-function skewyTransformCurve(curve = [], args = []) {}
+	function calculateNewPoint(oldPoint) {
+		if (!oldPoint) return false;
+		const oldX = parseFloat(oldPoint.x);
+		const oldY = parseFloat(oldPoint.y);
+		const newPoint = { x: 0, y: 0 };
+
+		newPoint.x = oldX + yMultiplier * oldY;
+		newPoint.y = oldY;
+
+		return newPoint;
+	}
+
+	resultCurve[0] = calculateNewPoint(curve[0]);
+	resultCurve[1] = calculateNewPoint(curve[1]);
+	resultCurve[2] = calculateNewPoint(curve[2]);
+	resultCurve[3] = calculateNewPoint(curve[3]);
+
+	log(`\t\tafter transform: ${JSON.stringify(resultCurve)}`);
+	return resultCurve;
+}
+
+function skewyTransformCurve(curve = [], args = []) {
+	const resultCurve = [];
+	log(`\t\tskewy: ${args.toString()}`);
+	log(`\t\tbefore transform: ${JSON.stringify(curve)}`);
+	const radians = (Math.PI / 180) * parseFloat(args[0]);
+	const xMultiplier = Math.tan(radians);
+
+	function calculateNewPoint(oldPoint) {
+		if (!oldPoint) return false;
+		const oldX = parseFloat(oldPoint.x);
+		const oldY = parseFloat(oldPoint.y);
+		const newPoint = { x: 0, y: 0 };
+
+		newPoint.x = oldX;
+		newPoint.y = oldY + xMultiplier * oldX;
+
+		return newPoint;
+	}
+
+	resultCurve[0] = calculateNewPoint(curve[0]);
+	resultCurve[1] = calculateNewPoint(curve[1]);
+	resultCurve[2] = calculateNewPoint(curve[2]);
+	resultCurve[3] = calculateNewPoint(curve[3]);
+
+	log(`\t\tafter transform: ${JSON.stringify(resultCurve)}`);
+	return resultCurve;
+}
 
 /*
 	SAMPLE

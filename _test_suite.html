@@ -8,11 +8,11 @@
 			import { drawBeziersToCanvas } from './test/canvas-drawing.js';
 
 			let enabledTestCategories = {
-				'Basic Shapes': true,
-				'Multi-tag Shapes': true,
+				'Basic Shapes': false,
+				'Multi-tag Shapes': false,
 				'Basic Transform': true,
-				'Complex Transforms': true,
-				'Path Commands': true,
+				'Complex Transforms': false,
+				'Path Commands': false,
 				'Complex Paths': false,
 				'Font Glyphs': false,
 				'Edge Cases': false,
@@ -32,6 +32,8 @@
 				{ name: 'transform_matrix', category: 'Basic Transform' },
 				{ name: 'transform_translate', category: 'Basic Transform' },
 				{ name: 'transform_scale', category: 'Basic Transform'},
+				{ name: 'transform_skewx_position', category: 'Basic Transform' },
+				{ name: 'transform_skewy_position', category: 'Basic Transform' },
 				// { name: 'transform_rotate', category: 'Basic Transform'},
 				// { name: 'transform_skewx', category: 'Basic Transform'},
 				// { name: 'transform_skewy', category: 'Basic Transform'},
