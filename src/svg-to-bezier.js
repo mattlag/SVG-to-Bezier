@@ -35,7 +35,7 @@ import { tagConvertRect } from './tag-convert-rect.js';
 import { applyTransformData, getTransformData } from './transforms.js';
 import { XMLtoJSON } from './xml-to-json.js';
 
-const enableConsoleLogging = true;
+export const enableConsoleLogging = true;
 
 /**
  * Takes an input SVG document in string format, and converts it to
@@ -62,6 +62,7 @@ export function SVGtoBezier(inputSVG) {
  */
 function convertTags(tagData) {
 	log(`\n\nCONVERT TAGS - START ${tagData.name}`);
+	log('tagData');
 	log(tagData);
 	if (!tagData?.content) return [];
 
@@ -69,19 +70,21 @@ function convertTags(tagData) {
 	const transformData = getTransformData(tagData);
 
 	tagData.content.forEach((tag) => {
-		log(`<<<<< tag ${tag.name}`);
+		log(`\n<<<<< tag ${tag.name}`);
+		log('tag');
 		log(tag);
+
 		const name = tag.name.toLowerCase();
 		const tagTransforms = getTransformData(tag);
 		log(`tagTransforms`);
 		log(tagTransforms);
 
 		if (convert[name]) {
-			log(`\t converting ${tag.name}`);
+			log(`\n==============\n\t converting ${tag.name}`);
 			let convertedTag = convert[name](tag)[0];
 			log(`converted tag: \n${JSON.stringify(convertedTag)}`);
 			if (tagTransforms) {
-				log(`\t transforming ${tag.name}`);
+				log(`\n==============\n\t transforming ${tag.name}`);
 				convertedTag = applyTransformData([convertedTag], tagTransforms);
 			}
 			log(`transformed tag: \n${JSON.stringify(convertedTag)}`);
@@ -89,7 +92,7 @@ function convertTags(tagData) {
 			result.push(convertedTag);
 		}
 
-		log(`>>>>> tag ${tag.name}`);
+		log(`\n>>>>> tag ${tag.name}\n`);
 	});
 
 	if (transformData) {
@@ -103,6 +106,9 @@ function convertTags(tagData) {
 	return result;
 }
 
+/**
+ * Conversion functions for each SVG tag type
+ */
 const convert = {
 	circle: tagConvertCircleEllipse,
 	ellipse: tagConvertCircleEllipse,
@@ -191,9 +197,16 @@ export function chunkAndValidateParameters(data = '') {
 	return validatedParameters;
 }
 
-/*
-	Helper functions
-*/
+/**
+ * Better rounding than Math.round
+ * @param {Number} num - number to round
+ * @param {Number} dec - number of decimal places
+ * @returns {Number}
+ */
+export function round(num, dec = 0) {
+	if (!num) return 0;
+	return Number(Math.round(`${num}e${dec}`) + `e-${dec}`) || 0;
+}
 
 export function log(message) {
 	if (enableConsoleLogging) console.log(message);

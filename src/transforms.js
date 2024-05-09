@@ -1,4 +1,5 @@
-import { log } from './svg-to-bezier.js';
+import { log, round } from './svg-to-bezier.js';
+const roundValues = true;
 
 export function getTransformData(tag) {
 	// log(`getTransformData`);
@@ -53,7 +54,8 @@ export function getTransformData(tag) {
 }
 
 export function applyTransformData(bezierPaths = [], transformData = []) {
-	log(`applyTransformData`);
+	log(`\napplyTransformData`);
+	log(`\n\t STARTING PATHS\n`);
 	log(JSON.stringify(bezierPaths));
 	log(transformData);
 	const resultBezierPaths = [];
@@ -71,13 +73,17 @@ export function applyTransformData(bezierPaths = [], transformData = []) {
 		}
 	}
 
+	log(`\n\t AFTER TRANSFORM PATHS\n`);
+	log(JSON.stringify(resultBezierPaths[0]));
 	return resultBezierPaths[0];
 }
 
 function applyTransformDataToCurve(curve, transformData = []) {
-	log(`\t\tapplyTransformDataToCurve`);
+	log(`\n\t\tapplyTransformDataToCurve`);
 	let resultCurve = curve;
 	const orderedTransforms = transformData.reverse();
+
+	log(JSON.stringify)
 	orderedTransforms.forEach((oneTransform) => {
 		if (transformCurve[oneTransform.name]) {
 			log(`\t\t${oneTransform.name}`);
@@ -104,7 +110,8 @@ function matrixTransformCurve(curve = [], args = []) {
 	const resultCurve = [];
 	while (args.length < 6) args.push(0);
 	log(`\t\tmatrix: ${args.toString()}`);
-	log(`\t\tbefore transform: ${JSON.stringify(curve)}`);
+	log(`\t\tbefore transform:`);
+	logCurve(curve);
 
 	function matrixTransformPoint(oldPoint) {
 		if (oldPoint === false) return false;
@@ -113,6 +120,12 @@ function matrixTransformCurve(curve = [], args = []) {
 		const newPoint = { x: 0, y: 0 };
 		newPoint.x = 1 * args[0] * oldX + 1 * args[2] * oldY + 1 * args[4];
 		newPoint.y = 1 * args[1] * oldX + 1 * args[3] * oldY + 1 * args[5];
+
+		if (roundValues) {
+			newPoint.x = round(newPoint.x, 3);
+			newPoint.y = round(newPoint.y, 3);
+		}
+
 		return newPoint;
 	}
 
@@ -121,7 +134,8 @@ function matrixTransformCurve(curve = [], args = []) {
 	resultCurve[2] = matrixTransformPoint(curve[2]);
 	resultCurve[3] = matrixTransformPoint(curve[3]);
 
-	log(`\t\tafter transform: ${JSON.stringify(resultCurve)}`);
+	log(`\t\tafter transform:`);
+	logCurve(resultCurve);
 	return resultCurve;
 }
 
@@ -131,7 +145,8 @@ function translateTransformCurve(curve = [], args = {}) {
 	const dy = parseFloat(args[1]);
 	log(`\t\ttranslate: ${dx}, ${dy}`);
 	log(`\t\tcurve[0]: ${curve[0].x}, ${curve[0].y}`);
-	log(`\t\tbefore transform: ${JSON.stringify(curve)}`);
+	log(`\t\tbefore transform:`);
+	logCurve(curve);
 
 	// Base point
 	resultCurve[0] = { x: 0, y: 0 };
@@ -161,7 +176,8 @@ function translateTransformCurve(curve = [], args = {}) {
 	resultCurve[3].x = parseFloat(curve[3].x) + dx;
 	resultCurve[3].y = parseFloat(curve[3].y) + dy;
 
-	log(`\t\tafter transform: ${JSON.stringify(resultCurve)}`);
+	log(`\t\tafter transform:`);
+	logCurve(resultCurve);
 	return resultCurve;
 }
 
@@ -172,13 +188,20 @@ function scaleTransformCurve(curve = [], args = []) {
 	const resultCurve = [];
 	log(`\t\tscale args: ${args.toString()}`);
 	log(`\t\tscale validated: ${scaleX}, ${scaleY}`);
-	log(`\t\tbefore transform: ${JSON.stringify(curve)}`);
+	log(`\t\tbefore transform:`);
+	logCurve(curve);
 
 	function calculateNewPoint(oldPoint) {
 		if (oldPoint === false) return false;
 		const newPoint = { x: 0, y: 0 };
 		newPoint.x = parseFloat(oldPoint.x) * scaleX;
 		newPoint.y = parseFloat(oldPoint.y) * scaleY;
+
+		if (roundValues) {
+			newPoint.x = round(newPoint.x, 3);
+			newPoint.y = round(newPoint.y, 3);
+		}
+
 		return newPoint;
 	}
 
@@ -187,7 +210,8 @@ function scaleTransformCurve(curve = [], args = []) {
 	resultCurve[2] = calculateNewPoint(curve[2]);
 	resultCurve[3] = calculateNewPoint(curve[3]);
 
-	log(`\t\tafter transform: ${JSON.stringify(resultCurve)}`);
+	log(`\t\tafter transform:`);
+	logCurve(resultCurve);
 	return resultCurve;
 }
 
@@ -197,7 +221,8 @@ function rotateTransformCurve(curve = [], args = []) {
 	const resultCurve = [];
 	log(`\t\trotate args: ${args.toString()}`);
 	log(`\t\trotate validated: ${angle}`);
-	log(`\t\tbefore transform: ${JSON.stringify(curve)}`);
+	log(`\t\tbefore transform:`);
+	logCurve(curve);
 
 	function rotatePoint(point) {
 		log('rotate', 'start');
@@ -217,6 +242,11 @@ function rotateTransformCurve(curve = [], args = []) {
 		newPoint.x = newX + about.x;
 		newPoint.y = newY + about.y;
 
+		if (roundValues) {
+			newPoint.x = round(newPoint.x, 3);
+			newPoint.y = round(newPoint.y, 3);
+		}
+
 		// log(newPoint);
 		// log('rotate', 'end');
 		return newPoint;
@@ -227,14 +257,16 @@ function rotateTransformCurve(curve = [], args = []) {
 	resultCurve[2] = rotatePoint(curve[2]);
 	resultCurve[3] = rotatePoint(curve[3]);
 
-	log(`\t\tafter transform: ${JSON.stringify(resultCurve)}`);
+	log(`\t\tafter transform:`);
+	logCurve(resultCurve);
 	return resultCurve;
 }
 
 function skewxTransformCurve(curve = [], args = []) {
 	const resultCurve = [];
 	log(`\t\tskewx: ${args.toString()}`);
-	log(`\t\tbefore transform: ${JSON.stringify(curve)}`);
+	log(`\t\tbefore transform:`);
+	logCurve(curve);
 	const radians = angleToRadians(args[0]);
 	const yMultiplier = Math.tan(radians);
 
@@ -247,6 +279,11 @@ function skewxTransformCurve(curve = [], args = []) {
 		newPoint.x = oldX + yMultiplier * oldY;
 		newPoint.y = oldY;
 
+		if (roundValues) {
+			newPoint.x = round(newPoint.x, 3);
+			newPoint.y = round(newPoint.y, 3);
+		}
+
 		return newPoint;
 	}
 
@@ -255,14 +292,16 @@ function skewxTransformCurve(curve = [], args = []) {
 	resultCurve[2] = calculateNewPoint(curve[2]);
 	resultCurve[3] = calculateNewPoint(curve[3]);
 
-	log(`\t\tafter transform: ${JSON.stringify(resultCurve)}`);
+	log(`\t\tafter transform:`);
+	logCurve(resultCurve);
 	return resultCurve;
 }
 
 function skewyTransformCurve(curve = [], args = []) {
 	const resultCurve = [];
 	log(`\t\tskewy: ${args.toString()}`);
-	log(`\t\tbefore transform: ${JSON.stringify(curve)}`);
+	log(`\t\tbefore transform:`);
+	logCurve(curve);
 	const radians = angleToRadians(args[0]);
 	const xMultiplier = Math.tan(radians);
 
@@ -275,6 +314,11 @@ function skewyTransformCurve(curve = [], args = []) {
 		newPoint.x = oldX;
 		newPoint.y = oldY + xMultiplier * oldX;
 
+		if (roundValues) {
+			newPoint.x = round(newPoint.x, 3);
+			newPoint.y = round(newPoint.y, 3);
+		}
+
 		return newPoint;
 	}
 
@@ -283,13 +327,21 @@ function skewyTransformCurve(curve = [], args = []) {
 	resultCurve[2] = calculateNewPoint(curve[2]);
 	resultCurve[3] = calculateNewPoint(curve[3]);
 
-	log(`\t\tafter transform: ${JSON.stringify(resultCurve)}`);
+	log(`\t\tafter transform:`);
+	logCurve(resultCurve);
 	return resultCurve;
 }
 
 function angleToRadians(angle) {
 	let result = (Math.PI / 180) * parseFloat(angle);
 	return result;
+}
+
+function logCurve(curve) {
+	console.table({
+		'x': [curve[0].x, curve[1]?.x, curve[2]?.x, curve[3].x],
+		'y': [curve[0].y, curve[1]?.y, curve[2]?.y, curve[3].y]
+	});
 }
 
 /*
