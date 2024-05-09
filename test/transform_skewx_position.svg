@@ -1,39 +1,29 @@
 <svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
-	<rect width="300" height="300" fill="lightgray"/>
 
-  <!-- Row 1 -->
   <rect x="10" y="0" width="20" height="20" />
   <rect x="10" y="0" width="20" height="20" fill="rgba(255, 0, 0, 0.75)" transform="skewX(45)" />
 
-  <!-- Row 2 -->
   <rect x="10" y="30" width="20" height="20" />
   <rect x="10" y="30" width="20" height="20" fill="rgba(255, 0, 0, 0.75)" transform="skewX(45)" />
   
-  <!-- Row 3 -->
   <rect x="10" y="60" width="20" height="20" />
   <rect x="10" y="60" width="20" height="20" fill="rgba(255, 0, 0, 0.75)" transform="skewX(45)" />
   
-  <!-- Row 4 -->
   <rect x="10" y="90" width="20" height="20" />
   <rect x="10" y="90" width="20" height="20" fill="rgba(255, 0, 0, 0.75)" transform="skewX(45)" />
   
-  <!-- Row 5 -->
   <rect x="10" y="120" width="20" height="20" />
   <rect x="10" y="120" width="20" height="20" fill="rgba(255, 0, 0, 0.75)" transform="skewX(45)" />
   
-  <!-- Row 6 -->
   <rect x="10" y="150" width="20" height="20" />
   <rect x="10" y="150" width="20" height="20" fill="rgba(255, 0, 0, 0.75)" transform="skewX(45)" />
   
-  <!-- Row 7 -->
   <rect x="10" y="180" width="20" height="20" />
   <rect x="10" y="180" width="20" height="20" fill="rgba(255, 0, 0, 0.75)" transform="skewX(45)" />
   
-  <!-- Row 8 -->
   <rect x="10" y="210" width="20" height="20" />
   <rect x="10" y="210" width="20" height="20" fill="rgba(255, 0, 0, 0.75)" transform="skewX(45)" />
   
-  <!-- Row 9 -->
   <rect x="10" y="240" width="20" height="20" />
   <rect x="10" y="240" width="20" height="20" fill="rgba(255, 0, 0, 0.75)" transform="skewX(45)" />
   

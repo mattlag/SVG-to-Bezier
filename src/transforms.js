@@ -191,13 +191,51 @@ function scaleTransformCurve(curve = [], args = []) {
 	return resultCurve;
 }
 
-function rotateTransformCurve(curve = [], args = []) {}
+function rotateTransformCurve(curve = [], args = []) {
+	const angle = angleToRadians(args[0]);
+	const about = { x: 0, y: 0 };
+	const resultCurve = [];
+	log(`\t\trotate args: ${args.toString()}`);
+	log(`\t\trotate validated: ${angle}`);
+	log(`\t\tbefore transform: ${JSON.stringify(curve)}`);
+
+	function rotatePoint(point) {
+		log('rotate', 'start');
+		log('point ' + JSON.stringify(point));
+		// log('Math angle:\t' + angle);
+		// log('about ' + json(about, true));
+
+		if (!angle || !point) return false;
+
+		const newPoint = { x: 0, y: 0 };
+		point.x -= about.x;
+		point.y -= about.y;
+
+		const newX = point.x * Math.cos(angle) - point.y * Math.sin(angle);
+		const newY = point.x * Math.sin(angle) + point.y * Math.cos(angle);
+
+		newPoint.x = newX + about.x;
+		newPoint.y = newY + about.y;
+
+		// log(newPoint);
+		// log('rotate', 'end');
+		return newPoint;
+	}
+
+	resultCurve[0] = rotatePoint(curve[0]);
+	resultCurve[1] = rotatePoint(curve[1]);
+	resultCurve[2] = rotatePoint(curve[2]);
+	resultCurve[3] = rotatePoint(curve[3]);
+
+	log(`\t\tafter transform: ${JSON.stringify(resultCurve)}`);
+	return resultCurve;
+}
 
 function skewxTransformCurve(curve = [], args = []) {
 	const resultCurve = [];
 	log(`\t\tskewx: ${args.toString()}`);
 	log(`\t\tbefore transform: ${JSON.stringify(curve)}`);
-	const radians = (Math.PI / 180) * parseFloat(args[0]);
+	const radians = angleToRadians(args[0]);
 	const yMultiplier = Math.tan(radians);
 
 	function calculateNewPoint(oldPoint) {
@@ -225,7 +263,7 @@ function skewyTransformCurve(curve = [], args = []) {
 	const resultCurve = [];
 	log(`\t\tskewy: ${args.toString()}`);
 	log(`\t\tbefore transform: ${JSON.stringify(curve)}`);
-	const radians = (Math.PI / 180) * parseFloat(args[0]);
+	const radians = angleToRadians(args[0]);
 	const xMultiplier = Math.tan(radians);
 
 	function calculateNewPoint(oldPoint) {
@@ -247,6 +285,11 @@ function skewyTransformCurve(curve = [], args = []) {
 
 	log(`\t\tafter transform: ${JSON.stringify(resultCurve)}`);
 	return resultCurve;
+}
+
+function angleToRadians(angle) {
+	let result = (Math.PI / 180) * parseFloat(angle);
+	return result;
 }
 
 /*
