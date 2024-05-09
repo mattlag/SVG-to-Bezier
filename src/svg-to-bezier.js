@@ -66,11 +66,11 @@ function convertTags(tagData) {
 	log(tagData);
 	if (!tagData?.content) return [];
 
-	let result = [];
+	let resultBezierPaths = [];
 	const transformData = getTransformData(tagData);
 
 	tagData.content.forEach((tag) => {
-		log(`\n<<<<< tag ${tag.name}`);
+		log(`\n<<<<< START TAG ${tag.name}`);
 		log('tag');
 		log(tag);
 
@@ -81,29 +81,28 @@ function convertTags(tagData) {
 
 		if (convert[name]) {
 			log(`\n==============\n\t converting ${tag.name}`);
-			let convertedTag = convert[name](tag)[0];
-			log(`converted tag: \n${JSON.stringify(convertedTag)}`);
+			let bezierPaths = convert[name](tag);
+			log(`converted tag: \n${JSON.stringify(bezierPaths)}`);
 			if (tagTransforms) {
 				log(`\n==============\n\t transforming ${tag.name}`);
-				convertedTag = applyTransformData([convertedTag], tagTransforms);
+				bezierPaths = applyTransformData(bezierPaths, tagTransforms);
 			}
-			log(`transformed tag: \n${JSON.stringify(convertedTag)}`);
-			// result = result.concat(convertedTag);
-			result.push(convertedTag);
+			log(`transformed tag: \n${JSON.stringify(bezierPaths)}`);
+			resultBezierPaths = resultBezierPaths.concat(bezierPaths);
 		}
 
-		log(`\n>>>>> tag ${tag.name}\n`);
+		log(`\n>>>>> END TAG ${tag.name}\n`);
 	});
 
 	if (transformData) {
 		log(`transforming ${tagData.name}`);
-		result = applyTransformData(result[0], transformData);
+		resultBezierPaths = applyTransformData(resultBezierPaths, transformData);
 	}
 
-	log(`RESULT IS`);
-	log(result);
+	log(`resultBezierPaths`);
+	log(resultBezierPaths);
 	log(`CONVERT TAGS - END ${tagData.name}\n\n`);
-	return result;
+	return resultBezierPaths;
 }
 
 /**
@@ -205,7 +204,16 @@ export function chunkAndValidateParameters(data = '') {
  */
 export function round(num, dec = 0) {
 	if (!num) return 0;
+	num = parseFloat(num);
 	return Number(Math.round(`${num}e${dec}`) + `e-${dec}`) || 0;
+}
+
+export function floatSanitize(num) {
+	const stringNum = String(num);
+	if (stringNum.indexOf('00000') > -1 || stringNum.indexOf('99999') > -1) {
+		num = round(num, 5);
+	}
+	return num;
 }
 
 export function log(message) {

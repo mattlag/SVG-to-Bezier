@@ -1,4 +1,4 @@
-import { log, round } from './svg-to-bezier.js';
+import { floatSanitize, log, round } from './svg-to-bezier.js';
 const roundValues = true;
 
 export function getTransformData(tag) {
@@ -40,9 +40,11 @@ export function getTransformData(tag) {
 				data[0] = data[0].trim();
 				data[1] = data[1].trim();
 				if (supported.indexOf(data[0]) > -1) {
+					let validatedArgs = data[1].split(' ');
+					validatedArgs = validatedArgs.map((arg) => parseFloat(arg));
 					transforms.push({
 						name: data[0],
-						args: data[1].split(' '),
+						args: validatedArgs,
 					});
 				}
 			}
@@ -55,47 +57,47 @@ export function getTransformData(tag) {
 
 export function applyTransformData(bezierPaths = [], transformData = []) {
 	log(`\napplyTransformData`);
-	log(`\n\t STARTING PATHS\n`);
+	log(`\t P A S S E D\n`);
+	log('bezierPaths');
 	log(JSON.stringify(bezierPaths));
+	log('transformData');
 	log(transformData);
-	const resultBezierPaths = [];
-
-	for (let p = 0; p < bezierPaths.length; p++) {
-		let singlePath = bezierPaths[p];
-		resultBezierPaths[p] = [];
-
-		for (let s = 0; s < singlePath.length; s++) {
-			let singleCurve = singlePath[s];
-			resultBezierPaths[p][s] = applyTransformDataToCurve(
-				singleCurve,
-				transformData
-			);
-		}
-	}
-
-	log(`\n\t AFTER TRANSFORM PATHS\n`);
-	log(JSON.stringify(resultBezierPaths[0]));
-	return resultBezierPaths[0];
-}
-
-function applyTransformDataToCurve(curve, transformData = []) {
-	log(`\n\t\tapplyTransformDataToCurve`);
-	let resultCurve = curve;
+	const resultBezierPaths = structuredClone(bezierPaths);
 	const orderedTransforms = transformData.reverse();
+	log(`\t V A L I D A T E D\n`);
+	log(`\t RESULT BEZIER PATHS (start)\n`);
+	log(JSON.stringify(resultBezierPaths));
+	log(`\t ORDERED TRANSFORMS\n`);
+	log(JSON.stringify(orderedTransforms));
 
-	log(JSON.stringify)
 	orderedTransforms.forEach((oneTransform) => {
 		if (transformCurve[oneTransform.name]) {
-			log(`\t\t${oneTransform.name}`);
-			resultCurve = transformCurve[oneTransform.name](
-				resultCurve,
-				oneTransform.args
-			);
+			log(`\n\t${oneTransform.name}`);
+			resultBezierPaths.forEach((singlePath, pathIndex) => {
+				singlePath.forEach((singleCurve, curveIndex) => {
+					log(`\n~~~ TRANSFORM CURVE ${curveIndex}`);
+					// log(`\t\tbefore transform:`);
+					// logCurve(singleCurve);
+
+					resultBezierPaths[pathIndex][curveIndex] = transformCurve[
+						oneTransform.name
+					](singleCurve, oneTransform.args);
+
+					// log(`\t\tafter transform:`);
+					// logCurve(resultBezierPaths[pathIndex][curveIndex]);
+				});
+			});
 		}
 	});
 
-	return resultCurve;
+	log(`\n\t AFTER TRANSFORM PATHS\n`);
+	log(JSON.stringify(resultBezierPaths));
+	return resultBezierPaths;
 }
+
+/*
+		Individual transform functions
+*/
 
 const transformCurve = {
 	matrix: matrixTransformCurve,
@@ -110,16 +112,18 @@ function matrixTransformCurve(curve = [], args = []) {
 	const resultCurve = [];
 	while (args.length < 6) args.push(0);
 	log(`\t\tmatrix: ${args.toString()}`);
-	log(`\t\tbefore transform:`);
-	logCurve(curve);
 
 	function matrixTransformPoint(oldPoint) {
 		if (oldPoint === false) return false;
-		const oldX = parseFloat(oldPoint.x);
-		const oldY = parseFloat(oldPoint.y);
+		const oldX = oldPoint.x;
+		const oldY = oldPoint.y;
 		const newPoint = { x: 0, y: 0 };
-		newPoint.x = 1 * args[0] * oldX + 1 * args[2] * oldY + 1 * args[4];
-		newPoint.y = 1 * args[1] * oldX + 1 * args[3] * oldY + 1 * args[5];
+		newPoint.x = floatSanitize(
+			1 * args[0] * oldX + 1 * args[2] * oldY + 1 * args[4]
+		);
+		newPoint.y = floatSanitize(
+			1 * args[1] * oldX + 1 * args[3] * oldY + 1 * args[5]
+		);
 
 		if (roundValues) {
 			newPoint.x = round(newPoint.x, 3);
@@ -134,68 +138,21 @@ function matrixTransformCurve(curve = [], args = []) {
 	resultCurve[2] = matrixTransformPoint(curve[2]);
 	resultCurve[3] = matrixTransformPoint(curve[3]);
 
-	log(`\t\tafter transform:`);
-	logCurve(resultCurve);
 	return resultCurve;
 }
 
 function translateTransformCurve(curve = [], args = {}) {
 	const resultCurve = [];
-	const dx = parseFloat(args[0]);
-	const dy = parseFloat(args[1]);
+	const dx = args[0];
+	const dy = args[1];
 	log(`\t\ttranslate: ${dx}, ${dy}`);
 	log(`\t\tcurve[0]: ${curve[0].x}, ${curve[0].y}`);
-	log(`\t\tbefore transform:`);
-	logCurve(curve);
-
-	// Base point
-	resultCurve[0] = { x: 0, y: 0 };
-	resultCurve[0].x = parseFloat(curve[0].x) + dx;
-	resultCurve[0].y = parseFloat(curve[0].y) + dy;
-
-	// Base point handle
-	if (curve[1]) {
-		resultCurve[1] = { x: 0, y: 0 };
-		resultCurve[1].x = parseFloat(curve[1].x) + dx;
-		resultCurve[1].y = parseFloat(curve[1].y) + dy;
-	} else {
-		resultCurve[1] = false;
-	}
-
-	// Destination point handle
-	if (curve[2]) {
-		resultCurve[2] = { x: 0, y: 0 };
-		resultCurve[2].x = parseFloat(curve[2].x) + dx;
-		resultCurve[2].y = parseFloat(curve[2].y) + dy;
-	} else {
-		resultCurve[2] = false;
-	}
-
-	// Destination point
-	resultCurve[3] = { x: 0, y: 0 };
-	resultCurve[3].x = parseFloat(curve[3].x) + dx;
-	resultCurve[3].y = parseFloat(curve[3].y) + dy;
-
-	log(`\t\tafter transform:`);
-	logCurve(resultCurve);
-	return resultCurve;
-}
-
-function scaleTransformCurve(curve = [], args = []) {
-	const scaleX = parseFloat(args[0]);
-	let scaleY = parseFloat(args[1]);
-	if (!scaleY) scaleY = scaleX;
-	const resultCurve = [];
-	log(`\t\tscale args: ${args.toString()}`);
-	log(`\t\tscale validated: ${scaleX}, ${scaleY}`);
-	log(`\t\tbefore transform:`);
-	logCurve(curve);
 
 	function calculateNewPoint(oldPoint) {
 		if (oldPoint === false) return false;
 		const newPoint = { x: 0, y: 0 };
-		newPoint.x = parseFloat(oldPoint.x) * scaleX;
-		newPoint.y = parseFloat(oldPoint.y) * scaleY;
+		newPoint.x = floatSanitize(oldPoint.x + dx);
+		newPoint.y = floatSanitize(oldPoint.y + dy);
 
 		if (roundValues) {
 			newPoint.x = round(newPoint.x, 3);
@@ -210,8 +167,36 @@ function scaleTransformCurve(curve = [], args = []) {
 	resultCurve[2] = calculateNewPoint(curve[2]);
 	resultCurve[3] = calculateNewPoint(curve[3]);
 
-	log(`\t\tafter transform:`);
-	logCurve(resultCurve);
+	return resultCurve;
+}
+
+function scaleTransformCurve(curve = [], args = []) {
+	const scaleX = args[0];
+	let scaleY = args[1];
+	if (!scaleY) scaleY = scaleX;
+	const resultCurve = [];
+	log(`\t\tscale args: ${args.toString()}`);
+	log(`\t\tscale validated: ${scaleX}, ${scaleY}`);
+
+	function calculateNewPoint(oldPoint) {
+		if (oldPoint === false) return false;
+		const newPoint = { x: 0, y: 0 };
+		newPoint.x = floatSanitize(oldPoint.x * scaleX);
+		newPoint.y = floatSanitize(oldPoint.y * scaleY);
+
+		if (roundValues) {
+			newPoint.x = round(newPoint.x, 3);
+			newPoint.y = round(newPoint.y, 3);
+		}
+
+		return newPoint;
+	}
+
+	resultCurve[0] = calculateNewPoint(curve[0]);
+	resultCurve[1] = calculateNewPoint(curve[1]);
+	resultCurve[2] = calculateNewPoint(curve[2]);
+	resultCurve[3] = calculateNewPoint(curve[3]);
+
 	return resultCurve;
 }
 
@@ -221,15 +206,8 @@ function rotateTransformCurve(curve = [], args = []) {
 	const resultCurve = [];
 	log(`\t\trotate args: ${args.toString()}`);
 	log(`\t\trotate validated: ${angle}`);
-	log(`\t\tbefore transform:`);
-	logCurve(curve);
 
 	function rotatePoint(point) {
-		log('rotate', 'start');
-		log('point ' + JSON.stringify(point));
-		// log('Math angle:\t' + angle);
-		// log('about ' + json(about, true));
-
 		if (!angle || !point) return false;
 
 		const newPoint = { x: 0, y: 0 };
@@ -239,8 +217,8 @@ function rotateTransformCurve(curve = [], args = []) {
 		const newX = point.x * Math.cos(angle) - point.y * Math.sin(angle);
 		const newY = point.x * Math.sin(angle) + point.y * Math.cos(angle);
 
-		newPoint.x = newX + about.x;
-		newPoint.y = newY + about.y;
+		newPoint.x = floatSanitize(newX + about.x);
+		newPoint.y = floatSanitize(newY + about.y);
 
 		if (roundValues) {
 			newPoint.x = round(newPoint.x, 3);
@@ -257,27 +235,23 @@ function rotateTransformCurve(curve = [], args = []) {
 	resultCurve[2] = rotatePoint(curve[2]);
 	resultCurve[3] = rotatePoint(curve[3]);
 
-	log(`\t\tafter transform:`);
-	logCurve(resultCurve);
 	return resultCurve;
 }
 
 function skewxTransformCurve(curve = [], args = []) {
 	const resultCurve = [];
 	log(`\t\tskewx: ${args.toString()}`);
-	log(`\t\tbefore transform:`);
-	logCurve(curve);
 	const radians = angleToRadians(args[0]);
 	const yMultiplier = Math.tan(radians);
 
 	function calculateNewPoint(oldPoint) {
 		if (!oldPoint) return false;
-		const oldX = parseFloat(oldPoint.x);
-		const oldY = parseFloat(oldPoint.y);
+		const oldX = oldPoint.x;
+		const oldY = oldPoint.y;
 		const newPoint = { x: 0, y: 0 };
 
-		newPoint.x = oldX + yMultiplier * oldY;
-		newPoint.y = oldY;
+		newPoint.x = floatSanitize(oldX + yMultiplier * oldY);
+		newPoint.y = floatSanitize(oldY);
 
 		if (roundValues) {
 			newPoint.x = round(newPoint.x, 3);
@@ -292,27 +266,23 @@ function skewxTransformCurve(curve = [], args = []) {
 	resultCurve[2] = calculateNewPoint(curve[2]);
 	resultCurve[3] = calculateNewPoint(curve[3]);
 
-	log(`\t\tafter transform:`);
-	logCurve(resultCurve);
 	return resultCurve;
 }
 
 function skewyTransformCurve(curve = [], args = []) {
 	const resultCurve = [];
 	log(`\t\tskewy: ${args.toString()}`);
-	log(`\t\tbefore transform:`);
-	logCurve(curve);
 	const radians = angleToRadians(args[0]);
 	const xMultiplier = Math.tan(radians);
 
 	function calculateNewPoint(oldPoint) {
 		if (!oldPoint) return false;
-		const oldX = parseFloat(oldPoint.x);
-		const oldY = parseFloat(oldPoint.y);
+		const oldX = oldPoint.x;
+		const oldY = oldPoint.y;
 		const newPoint = { x: 0, y: 0 };
 
-		newPoint.x = oldX;
-		newPoint.y = oldY + xMultiplier * oldX;
+		newPoint.x = floatSanitize(oldX);
+		newPoint.y = floatSanitize(oldY + xMultiplier * oldX);
 
 		if (roundValues) {
 			newPoint.x = round(newPoint.x, 3);
@@ -327,8 +297,6 @@ function skewyTransformCurve(curve = [], args = []) {
 	resultCurve[2] = calculateNewPoint(curve[2]);
 	resultCurve[3] = calculateNewPoint(curve[3]);
 
-	log(`\t\tafter transform:`);
-	logCurve(resultCurve);
 	return resultCurve;
 }
 
@@ -338,9 +306,10 @@ function angleToRadians(angle) {
 }
 
 function logCurve(curve) {
+	// console.log(JSON.stringify(curve));
 	console.table({
-		'x': [curve[0].x, curve[1]?.x, curve[2]?.x, curve[3].x],
-		'y': [curve[0].y, curve[1]?.y, curve[2]?.y, curve[3].y]
+		x: [curve[0].x, curve[1]?.x, curve[2]?.x, curve[3].x],
+		y: [curve[0].y, curve[1]?.y, curve[2]?.y, curve[3].y],
 	});
 }
 

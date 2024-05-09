@@ -29,7 +29,7 @@ export function drawBeziersToCanvas(bezierPaths, ctx) {
 function drawPoint(point, ctx, accent) {
 	ctx.save();
 	ctx.fillStyle = accent;
-	ctx.fillText(`${point.x}, ${point.y}`, point.x - 2, point.y - 4);
+	// ctx.fillText(`${point.x}, ${point.y}`, point.x - 2, point.y - 4);
 	ctx.fillRect(point.x - 2, point.y - 2, 4, 4);
 	ctx.restore();
 }
