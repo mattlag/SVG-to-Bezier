@@ -9,24 +9,21 @@ export function XMLtoJSON(inputXML) {
 	let xmlDoc;
 	let xmlError;
 
-	if (typeof window.DOMParser !== 'undefined') {
-		xmlDoc = new window.DOMParser().parseFromString(inputXML, 'text/xml');
-	} else if (
-		typeof window.ActiveXObject !== 'undefined' &&
-		new window.ActiveXObject('Microsoft.XMLDOM')
-	) {
-		xmlDoc = new window.ActiveXObject('Microsoft.XMLDOM');
-		xmlDoc.async = 'false';
+	if (typeof window.DOMParser !== "undefined") {
+		xmlDoc = new window.DOMParser().parseFromString(inputXML, "text/xml");
+	} else if (typeof window.ActiveXObject !== "undefined" && new window.ActiveXObject("Microsoft.XMLDOM")) {
+		xmlDoc = new window.ActiveXObject("Microsoft.XMLDOM");
+		xmlDoc.async = "false";
 		xmlDoc.loadXML(inputXML);
 	} else {
-		console.warn('No XML document parser found.');
-		xmlError = new SyntaxError('No XML document parser found.');
+		console.warn("No XML document parser found.");
+		xmlError = new SyntaxError("No XML document parser found.");
 		throw xmlError;
 	}
 
-	const error = xmlDoc.getElementsByTagName('parserError');
+	const error = xmlDoc.getElementsByTagName("parserError");
 	if (error.length) {
-		const message = xmlDoc.getElementsByTagName('div')[0].innerHTML;
+		const message = xmlDoc.getElementsByTagName("div")[0].innerHTML;
 		xmlError = new SyntaxError(trim(message));
 		throw xmlError;
 	}
@@ -52,12 +49,12 @@ function tag_getContent(parent) {
 
 	for (const node of kids) {
 		tagResult = {};
-		if (node.nodeName === '#comment') continue;
+		if (node.nodeName === "#comment") continue;
 
 		tagContent = tag_getContent(node);
 		tagAttributes = tag_getAttributes(node.attributes);
 
-		if (node.nodeName === '#text' && JSON.stringify(tagAttributes) === '{}') {
+		if (node.nodeName === "#text" && JSON.stringify(tagAttributes) === "{}") {
 			tagResult = trim(tagContent);
 		} else {
 			tagResult.name = node.nodeName;
@@ -65,7 +62,7 @@ function tag_getContent(parent) {
 			tagResult.content = tagContent;
 		}
 
-		if (tagResult !== '') result.push(tagResult);
+		if (tagResult !== "") result.push(tagResult);
 	}
 
 	return result;
@@ -85,9 +82,9 @@ function tag_getAttributes(attributes) {
 
 function trim(text) {
 	try {
-		text = text.replace(/^\s+|\s+$/g, '');
-		return text.replace(/(\r\n|\n|\r|\t)/gm, '');
+		text = text.replace(/^\s+|\s+$/g, "");
+		return text.replace(/(\r\n|\n|\r|\t)/gm, "");
 	} catch (e) {
-		return '';
+		return "";
 	}
 }

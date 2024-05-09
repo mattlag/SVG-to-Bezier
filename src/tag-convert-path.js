@@ -1,9 +1,5 @@
-import {
-	chunkAndValidateParameters,
-	floatSanitize,
-	sanitizeParameterData,
-} from './svg-to-bezier.js';
-import { convertArcToCommandToBezier } from './tag-convert-path-arc.js';
+import { chunkAndValidateParameters, floatSanitize, sanitizeParameterData } from "./svg-to-bezier.js";
+import { convertArcToCommandToBezier } from "./tag-convert-path-arc.js";
 
 /**
  * Converts an SVG Path tag to Bezier Data Format
@@ -12,7 +8,7 @@ import { convertArcToCommandToBezier } from './tag-convert-path-arc.js';
  */
 export function tagConvertPath(tagData = {}) {
 	// log(`\ntagConvertPath`);
-	const dAttribute = tagData.attributes.d || '';
+	const dAttribute = tagData.attributes.d || "";
 	// log(`\t dAttribute: ${dAttribute}`);
 
 	// Check for commands
@@ -65,21 +61,16 @@ function convertCommandsToBezierPaths(commands) {
 		const params = command.parameters || [];
 		params.forEach((param, i) => (params[i] = floatSanitize(param)));
 
-		if (command.type === 'M') {
+		if (command.type === "M") {
 			currentX = params[0];
 			currentY = params[1];
 		}
-		if (command.type === 'L') {
-			currentPath.push([
-				{ x: currentX, y: currentY },
-				false,
-				false,
-				{ x: params[0], y: params[1] },
-			]);
+		if (command.type === "L") {
+			currentPath.push([{ x: currentX, y: currentY }, false, false, { x: params[0], y: params[1] }]);
 			currentX = params[0];
 			currentY = params[1];
 		}
-		if (command.type === 'C') {
+		if (command.type === "C") {
 			currentPath.push([
 				{ x: currentX, y: currentY },
 				{ x: params[0], y: params[1] },
@@ -89,7 +80,7 @@ function convertCommandsToBezierPaths(commands) {
 			currentX = params[4];
 			currentY = params[5];
 		}
-		if (command.type === 'Z') {
+		if (command.type === "Z") {
 			bezierPaths.push(currentPath);
 			currentPath = [];
 		}
@@ -125,7 +116,7 @@ function chunkCommands(dAttribute) {
 	if (commandStart === false) {
 		// No valid commands found
 		// log(`No valid commands found, returning Z`);
-		return [{ type: 'Z' }];
+		return [{ type: "Z" }];
 	}
 
 	// Loop through the string
@@ -133,9 +124,7 @@ function chunkCommands(dAttribute) {
 		if (isCommand(data.charAt(i))) {
 			result.push({
 				type: data.charAt(commandStart),
-				parameters: chunkAndValidateParameters(
-					data.substring(commandStart + 1, i)
-				),
+				parameters: chunkAndValidateParameters(data.substring(commandStart + 1, i)),
 			});
 
 			commandStart = i;
@@ -146,9 +135,7 @@ function chunkCommands(dAttribute) {
 	if (commandStart < data.length - 1) {
 		result.push({
 			type: data.charAt(commandStart),
-			parameters: chunkAndValidateParameters(
-				data.substring(commandStart + 1, data.length)
-			),
+			parameters: chunkAndValidateParameters(data.substring(commandStart + 1, data.length)),
 		});
 	}
 
@@ -163,10 +150,10 @@ function convertToAbsolute(commands) {
 	let newPoint = { x: 0, y: 0 };
 
 	commands.forEach((command) => {
-		if (command.type === 'm' || command.type === 'l') {
+		if (command.type === "m" || command.type === "l") {
 			// MoveTo and LineTo
 			newCommand = {
-				type: command.type === 'm' ? 'M' : 'L',
+				type: command.type === "m" ? "M" : "L",
 				parameters: [],
 			};
 
@@ -180,10 +167,10 @@ function convertToAbsolute(commands) {
 			}
 
 			result.push(newCommand);
-		} else if (command.type === 'h') {
+		} else if (command.type === "h") {
 			// Horizontal line to
 			newCommand = {
-				type: 'H',
+				type: "H",
 				parameters: [],
 			};
 
@@ -194,10 +181,10 @@ function convertToAbsolute(commands) {
 			}
 
 			result.push(newCommand);
-		} else if (command.type === 'v') {
+		} else if (command.type === "v") {
 			// Horizontal line to
 			newCommand = {
-				type: 'V',
+				type: "V",
 				parameters: [],
 			};
 
@@ -208,10 +195,10 @@ function convertToAbsolute(commands) {
 			}
 
 			result.push(newCommand);
-		} else if (command.type === 'c') {
+		} else if (command.type === "c") {
 			// Cubic Bezier
 			newCommand = {
-				type: 'C',
+				type: "C",
 				parameters: [],
 			};
 
@@ -229,10 +216,10 @@ function convertToAbsolute(commands) {
 			}
 
 			result.push(newCommand);
-		} else if (command.type === 's') {
+		} else if (command.type === "s") {
 			// Smooth Cubic Bezier
 			newCommand = {
-				type: 'S',
+				type: "S",
 				parameters: [],
 			};
 
@@ -248,10 +235,10 @@ function convertToAbsolute(commands) {
 			}
 
 			result.push(newCommand);
-		} else if (command.type === 'q') {
+		} else if (command.type === "q") {
 			// Quadratic Bezier
 			newCommand = {
-				type: 'Q',
+				type: "Q",
 				parameters: [],
 			};
 
@@ -267,10 +254,10 @@ function convertToAbsolute(commands) {
 			}
 
 			result.push(newCommand);
-		} else if (command.type === 't') {
+		} else if (command.type === "t") {
 			// Smooth Quadratic Bezier
 			newCommand = {
-				type: 'T',
+				type: "T",
 				parameters: [],
 			};
 
@@ -284,10 +271,10 @@ function convertToAbsolute(commands) {
 			}
 
 			result.push(newCommand);
-		} else if (command.type === 'a') {
+		} else if (command.type === "a") {
 			// Arc to
 			newCommand = {
-				type: 'A',
+				type: "A",
 				parameters: [],
 			};
 			// log(`Arc to relative parameters\n${command.parameters}`);
@@ -306,9 +293,9 @@ function convertToAbsolute(commands) {
 			}
 
 			result.push(newCommand);
-		} else if (command.type === 'z') {
+		} else if (command.type === "z") {
 			// End path
-			result.push({ type: 'Z' });
+			result.push({ type: "Z" });
 		} else {
 			// command is absolute, push it
 			result.push(command);
@@ -325,15 +312,15 @@ function splitChainParameters(commands) {
 	commands.forEach((command) => {
 		if (command.type) {
 			switch (command.type) {
-				case 'Z':
-				case 'z':
-					result.push({ type: 'Z' });
+				case "Z":
+				case "z":
+					result.push({ type: "Z" });
 					break;
 
-				case 'H':
-				case 'V':
-				case 'h':
-				case 'v':
+				case "H":
+				case "V":
+				case "h":
+				case "v":
 					for (let p = 0; p < command.parameters.length; p += 2) {
 						result.push({
 							type: command.type,
@@ -342,30 +329,30 @@ function splitChainParameters(commands) {
 					}
 					break;
 
-				case 'M':
+				case "M":
 					// Chained MoveTo commands are treated like LineTo commands
 					for (let p = 0; p < command.parameters.length; p += 2) {
 						result.push({
-							type: p < 2 ? 'M' : 'L',
+							type: p < 2 ? "M" : "L",
 							parameters: [command.parameters[p], command.parameters[p + 1]],
 						});
 					}
 					break;
 
-				case 'm':
+				case "m":
 					// Chained MoveTo commands are treated like LineTo commands
 					for (let p = 0; p < command.parameters.length; p += 2) {
 						result.push({
-							type: p < 2 ? 'm' : 'l',
+							type: p < 2 ? "m" : "l",
 							parameters: [command.parameters[p], command.parameters[p + 1]],
 						});
 					}
 					break;
 
-				case 'L':
-				case 'T':
-				case 'l':
-				case 't':
+				case "L":
+				case "T":
+				case "l":
+				case "t":
 					for (let p = 0; p < command.parameters.length; p += 2) {
 						result.push({
 							type: command.type,
@@ -374,42 +361,30 @@ function splitChainParameters(commands) {
 					}
 					break;
 
-				case 'Q':
-				case 'S':
-				case 'q':
-				case 's':
+				case "Q":
+				case "S":
+				case "q":
+				case "s":
 					for (let p = 0; p < command.parameters.length; p += 4) {
 						result.push({
 							type: command.type,
-							parameters: [
-								command.parameters[p],
-								command.parameters[p + 1],
-								command.parameters[p + 2],
-								command.parameters[p + 3],
-							],
+							parameters: [command.parameters[p], command.parameters[p + 1], command.parameters[p + 2], command.parameters[p + 3]],
 						});
 					}
 					break;
 
-				case 'C':
-				case 'c':
+				case "C":
+				case "c":
 					for (let p = 0; p < command.parameters.length; p += 6) {
 						result.push({
 							type: command.type,
-							parameters: [
-								command.parameters[p],
-								command.parameters[p + 1],
-								command.parameters[p + 2],
-								command.parameters[p + 3],
-								command.parameters[p + 4],
-								command.parameters[p + 5],
-							],
+							parameters: [command.parameters[p], command.parameters[p + 1], command.parameters[p + 2], command.parameters[p + 3], command.parameters[p + 4], command.parameters[p + 5]],
 						});
 					}
 					break;
 
-				case 'A':
-				case 'a':
+				case "A":
+				case "a":
 					for (let p = 0; p < command.parameters.length; p += 7) {
 						result.push({
 							type: command.type,
@@ -440,17 +415,17 @@ function convertLineTo(commands) {
 	commands.forEach((command) => {
 		// log(`doing ${command.type} [${command.parameters.join()}]`);
 
-		if (command.type === 'H') {
+		if (command.type === "H") {
 			for (let p = 0; p < command.parameters.length; p++) {
 				result.push({
-					type: 'L',
+					type: "L",
 					parameters: [command.parameters[p], currentPoint.y],
 				});
 			}
-		} else if (command.type === 'V') {
+		} else if (command.type === "V") {
 			for (let p = 0; p < command.parameters.length; p++) {
 				result.push({
-					type: 'L',
+					type: "L",
 					parameters: [currentPoint.x, command.parameters[p]],
 				});
 			}
@@ -475,15 +450,15 @@ function convertSmoothBeziers(commands) {
 	let previousResult;
 
 	commands.forEach((command) => {
-		if (command.type === 'S' || command.type === 'T') {
+		if (command.type === "S" || command.type === "T") {
 			previousResult = result.length > 1 ? result.at(-1) : false;
 
 			// This allows for using a smooth cubic after a quadratic,
 			// or a smooth quadratic after a cubic... which may not be standard
-			if (previousResult && previousResult.type === 'C') {
+			if (previousResult && previousResult.type === "C") {
 				previousHandle.x = previousResult.parameters[2];
 				previousHandle.y = previousResult.parameters[3];
-			} else if (previousResult && previousResult.type === 'Q') {
+			} else if (previousResult && previousResult.type === "Q") {
 				previousHandle.x = previousResult.parameters[0];
 				previousHandle.y = previousResult.parameters[1];
 			} else {
@@ -496,27 +471,15 @@ function convertSmoothBeziers(commands) {
 				y: currentPoint.y - previousHandle.y + currentPoint.y,
 			};
 
-			if (command.type === 'S') {
+			if (command.type === "S") {
 				result.push({
-					type: 'C',
-					parameters: [
-						smoothHandle.x,
-						smoothHandle.y,
-						command.parameters[0],
-						command.parameters[1],
-						command.parameters[2],
-						command.parameters[3],
-					],
+					type: "C",
+					parameters: [smoothHandle.x, smoothHandle.y, command.parameters[0], command.parameters[1], command.parameters[2], command.parameters[3]],
 				});
-			} else if (command.type === 'T') {
+			} else if (command.type === "T") {
 				result.push({
-					type: 'Q',
-					parameters: [
-						smoothHandle.x,
-						smoothHandle.y,
-						command.parameters[0],
-						command.parameters[1],
-					],
+					type: "Q",
+					parameters: [smoothHandle.x, smoothHandle.y, command.parameters[0], command.parameters[1]],
 				});
 			}
 		} else {
@@ -544,7 +507,7 @@ function convertQuadraticBeziers(commands) {
 	let c2y;
 
 	commands.forEach((command) => {
-		if (command.type === 'Q') {
+		if (command.type === "Q") {
 			q0x = currentPoint.x;
 			q0y = currentPoint.y;
 			q1x = command.parameters[0];
@@ -558,7 +521,7 @@ function convertQuadraticBeziers(commands) {
 			c2x = q2x + (2 / 3) * (q1x - q2x);
 			c2y = q2y + (2 / 3) * (q1y - q2y);
 
-			result.push({ type: 'C', parameters: [c1x, c1y, c2x, c2y, q2x, q2y] });
+			result.push({ type: "C", parameters: [c1x, c1y, c2x, c2y, q2x, q2y] });
 		} else {
 			result.push(command);
 		}
@@ -575,7 +538,7 @@ function convertArcs(commands) {
 	let currentPoint = { x: 0, y: 0 };
 
 	commands.forEach((command) => {
-		if (command.type === 'A') {
+		if (command.type === "A") {
 			for (let p = 0; p < command.parameters.length; p += 7) {
 				convertedBeziers = convertArcToCommandToBezier(
 					currentPoint.x,
@@ -595,15 +558,8 @@ function convertArcs(commands) {
 				// Split Chains
 				for (let i = 0; i < convertedBeziers.length; i += 6) {
 					result.push({
-						type: 'C',
-						parameters: [
-							convertedBeziers[i + 0],
-							convertedBeziers[i + 1],
-							convertedBeziers[i + 2],
-							convertedBeziers[i + 3],
-							convertedBeziers[i + 4],
-							convertedBeziers[i + 5],
-						],
+						type: "C",
+						parameters: [convertedBeziers[i + 0], convertedBeziers[i + 1], convertedBeziers[i + 2], convertedBeziers[i + 3], convertedBeziers[i + 4], convertedBeziers[i + 5]],
 					});
 				}
 
@@ -632,66 +588,66 @@ function getNewEndPoint(currentPoint, command) {
 	};
 
 	switch (command.type) {
-		case 'Z':
-		case 'z':
+		case "Z":
+		case "z":
 			break;
 
-		case 'H':
+		case "H":
 			returnPoint.x = command.parameters.at(-1);
 			break;
 
-		case 'V':
+		case "V":
 			returnPoint.y = command.parameters.at(-1);
 			break;
 
-		case 'M':
-		case 'L':
-		case 'C':
-		case 'S':
-		case 'A':
-		case 'Q':
-		case 'T':
+		case "M":
+		case "L":
+		case "C":
+		case "S":
+		case "A":
+		case "Q":
+		case "T":
 			returnPoint.x = command.parameters.at(-2);
 			returnPoint.y = command.parameters.at(-1);
 			break;
 
-		case 'h':
+		case "h":
 			for (let p = 0; p < command.parameters.length; p++) {
 				returnPoint.x += command.parameters[p];
 			}
 			break;
 
-		case 'v':
+		case "v":
 			for (let p = 0; p < command.parameters.length; p++) {
 				returnPoint.y += command.parameters[p];
 			}
 			break;
 
-		case 'm':
-		case 'l':
-		case 't':
+		case "m":
+		case "l":
+		case "t":
 			for (let p = 0; p < command.parameters.length; p += 2) {
 				returnPoint.x += command.parameters[p + 0];
 				returnPoint.y += command.parameters[p + 1];
 			}
 			break;
 
-		case 'q':
-		case 's':
+		case "q":
+		case "s":
 			for (let p = 0; p < command.parameters.length; p += 4) {
 				returnPoint.x += command.parameters[p + 2];
 				returnPoint.y += command.parameters[p + 3];
 			}
 			break;
 
-		case 'c':
+		case "c":
 			for (let p = 0; p < command.parameters.length; p += 6) {
 				returnPoint.x += command.parameters[p + 4];
 				returnPoint.y += command.parameters[p + 5];
 			}
 			break;
 
-		case 'a':
+		case "a":
 			for (let p = 0; p < command.parameters.length; p += 7) {
 				returnPoint.x += command.parameters[p + 5];
 				returnPoint.y += command.parameters[p + 6];
@@ -704,6 +660,6 @@ function getNewEndPoint(currentPoint, command) {
 
 function isCommand(c) {
 	// log(`isCommand passed ${c}`);
-	if ('MmLlCcSsZzHhVvAaQqTt'.indexOf(c) > -1) return true;
+	if ("MmLlCcSsZzHhVvAaQqTt".indexOf(c) > -1) return true;
 	return false;
 }

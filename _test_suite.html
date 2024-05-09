@@ -1,196 +1,125 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<title>SVG to Bezier - Test Suite</title>
-		<script type="module">
-			import { SVGtoBezier } from './src/svg-to-bezier.js';
-			import { drawBeziersToCanvas } from './test/canvas-drawing.js';
+  <head>
+    <meta charset="UTF-8" />
+    <title>SVG to Bezier - Test Suite</title>
+    <script type="module">
+      import { SVGtoBezier } from "./src/svg-to-bezier.js";
+      import { drawBeziersToCanvas } from "./test/canvas-drawing.js";
+      import { testFiles, enabledTestCategories } from "./test/test_files.js";
 
-			let enabledTestCategories = {
-				'Basic Shapes': true,
-				'Multi-tag Shapes': true,
-				'Path Commands': true,
-				'Complex Paths': true,
-				'Single Transform': true,
-				'Multi Transforms': true,
-				'Inherited Transforms': false,
-				'Font Glyphs': true,
-				'Edge Cases': true,
-			};
+      let fileContent = {};
 
-			let files = [
-				{ category: 'Basic Shapes', name: 'shape_circle' },
-				{ category: 'Basic Shapes', name: 'shape_ellipse' },
-				{ category: 'Basic Shapes', name: 'shape_polygon' },
-				{ category: 'Basic Shapes', name: 'shape_polyline' },
-				{ category: 'Basic Shapes', name: 'shape_rect' },
-				{ category: 'Multi-tag Shapes', name: 'shape_circle_multi' },
-				{ category: 'Multi-tag Shapes', name: 'shape_ellipse_multi' },
-				{ category: 'Multi-tag Shapes', name: 'shape_polygon_multi' },
-				{ category: 'Multi-tag Shapes', name: 'shape_polyline_multi' },
-				{ category: 'Multi-tag Shapes', name: 'shape_rect_multi' },
-				{ category: 'Path Commands', name: 'path_A' },
-				{ category: 'Path Commands', name: 'path_A2' },
-				{ category: 'Path Commands', name: 'path_Ar' },
-				{ category: 'Path Commands', name: 'path_Ar2' },
-				{ category: 'Path Commands', name: 'path_C' },
-				{ category: 'Path Commands', name: 'path_Cr' },
-				{ category: 'Path Commands', name: 'path_HV' },
-				{ category: 'Path Commands', name: 'path_HVr' },
-				{ category: 'Path Commands', name: 'path_L' },
-				{ category: 'Path Commands', name: 'path_Lr' },
-				{ category: 'Path Commands', name: 'path_M' },
-				{ category: 'Path Commands', name: 'path_Mr' },
-				{ category: 'Path Commands', name: 'path_Q' },
-				{ category: 'Path Commands', name: 'path_Qr' },
-				{ category: 'Path Commands', name: 'path_S' },
-				{ category: 'Path Commands', name: 'path_Sr' },
-				{ category: 'Path Commands', name: 'path_T' },
-				{ category: 'Path Commands', name: 'path_Tr' },
-				{ category: 'Complex Paths', name: 'multi_shape_1' },
-				{ category: 'Complex Paths', name: 'multi_shape_2' },
-				{ category: 'Complex Paths', name: 'multi_shape_3' },
-				{ category: 'Complex Paths', name: 'multi_shape_4' },
-				{ category: 'Complex Paths', name: 'multi_shape_5' },
-				{ category: 'Single Transform', name: 'transform_matrix' },
-				{ category: 'Single Transform', name: 'transform_translate' },
-				{ category: 'Single Transform', name: 'transform_scale' },
-				{ category: 'Single Transform', name: 'transform_skewx_position' },
-				{ category: 'Single Transform', name: 'transform_skewy_position' },
-				{ category: 'Single Transform', name: 'transform_rotate' },
-				{ category: 'Single Transform', name: 'transform_skewx' },
-				{ category: 'Single Transform', name: 'transform_skewy' },
-				{ category: 'Multi Transforms', name: 'transforms_attribute_order' },
-				{ category: 'Inherited Transforms', name: 'transforms_hierarchy_order' },
-				{ category: 'Inherited Transforms', name: 'transforms_heart' },
-				{ category: 'Font Glyphs', name: 'font_libre_caslon_paren' },
-				{ category: 'Font Glyphs', name: 'font_libre_caslon_s' },
-				{ category: 'Edge Cases', name: 'error_not_enough_commands' },
-				{ category: 'Edge Cases', name: 'error_blank' },
-			];
-
-			let fileContent = {};
-
-			document.addEventListener('DOMContentLoaded', () => {
-				let target = document.getElementById('target');
-				let currentCategory = false;
-				files.forEach((fileData) => {
-					if (enabledTestCategories[fileData.category]) {
-						if (currentCategory !== fileData.category) {
-							currentCategory = fileData.category;
-							target.innerHTML += `<h2>${currentCategory}</h2>`;
-						}
-						let fileName = fileData.name;
-						console.log(`File ${fileName}`);
-						target.innerHTML += `
+      document.addEventListener("DOMContentLoaded", () => {
+        let target = document.getElementById("target");
+        let currentCategory = false;
+        testFiles.forEach((fileData) => {
+          if (enabledTestCategories[fileData.category]) {
+            if (currentCategory !== fileData.category) {
+              currentCategory = fileData.category;
+              target.innerHTML += `<h2>${currentCategory}</h2>`;
+            }
+            let fileName = fileData.name;
+            console.log(`File ${fileName}`);
+            target.innerHTML += `
 						<h3>${fileName}</h3>
 							<object id="pre-img-${fileName}" data="./test/${fileName}.svg" type="image/svg+xml"></object>
 							<textarea id="pre-src-${fileName}"></textarea>
 							<canvas id="post-img-${fileName}" class="post-img" height="300" height="300"></canvas>
 							<textarea id="post-src-${fileName}"></textarea>
 						`;
-					}
-				});
+          }
+        });
 
-				files.forEach((fileData) => {
-					if (enabledTestCategories[fileData.category]) {
-						let fileName = fileData.name;
+        testFiles.forEach((fileData) => {
+          if (enabledTestCategories[fileData.category]) {
+            let fileName = fileData.name;
+            console.log(`...loading ${fileName}`);
+            document.getElementById(`pre-img-${fileName}`).addEventListener(
+              "load",
+              function () {
+                console.log(`\n\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n${fileName}`);
+                console.log(this.contentDocument);
+                if (this.contentDocument) {
+                  let preSource = this.contentDocument.children[0].outerHTML;
+                  document.getElementById(`pre-src-${fileName}`).innerHTML = preSource;
+                  fileContent[fileName] = preSource;
+                  let bezierPaths = SVGtoBezier(preSource);
 
-						document.getElementById(`pre-img-${fileName}`).addEventListener(
-							'load',
-							function () {
-								console.log(`\n\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n${fileName}`);
-								console.log(this.contentDocument);
-								if (this.contentDocument) {
-									let preSource = this.contentDocument.children[0].outerHTML;
-									document.getElementById(`pre-src-${fileName}`).innerHTML =
-										preSource;
-									fileContent[fileName] = preSource;
-									let bezierPaths = SVGtoBezier(preSource);
+                  let codeOutput = JSON.stringify(bezierPaths);
+                  codeOutput = codeOutput.replaceAll("],", "],\n");
+                  codeOutput = codeOutput.replaceAll("[[[", "[[\n[");
+                  codeOutput = codeOutput.replaceAll("[[", "[\n[");
+                  codeOutput = codeOutput.replaceAll("]]]", "]\n]]");
+                  codeOutput = codeOutput.replaceAll("]]", "]\n]");
+                  document.getElementById(`post-src-${fileName}`).innerHTML = codeOutput;
 
-									let codeOutput = JSON.stringify(bezierPaths);
-									codeOutput = codeOutput.replaceAll('],', '],\n');
-									codeOutput = codeOutput.replaceAll('[[[', '[[\n[');
-									codeOutput = codeOutput.replaceAll('[[', '[\n[');
-									codeOutput = codeOutput.replaceAll(']]]', ']\n]]');
-									codeOutput = codeOutput.replaceAll(']]', ']\n]');
-									document.getElementById(`post-src-${fileName}`).innerHTML =
-										codeOutput;
+                  console.log(`DRAWING ${bezierPaths.length} PATHS for ${fileName}`);
+                  console.log(bezierPaths);
+                  drawBeziersToCanvas(bezierPaths, document.getElementById(`post-img-${fileName}`).getContext("2d"));
+                } else {
+                  let message = "Only works on a server, something like `npx http-server`";
+                  document.getElementById("target").innerHTML = message;
+                  console.error(message);
+                }
+                console.log(`\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n${fileName}\n\n\n`);
+              },
+              false
+            );
+          }
+        });
+      });
+    </script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-weight: normal;
+        font-family: sans-serif;
+      }
 
-									console.log(
-										`DRAWING ${bezierPaths.length} PATHS for ${fileName}`
-									);
-									console.log(bezierPaths);
-									drawBeziersToCanvas(
-										bezierPaths,
-										document
-											.getElementById(`post-img-${fileName}`)
-											.getContext('2d')
-									);
-								} else {
-									let message =
-										'Only works on a server, something like `npx http-server`';
-									document.getElementById('target').innerHTML = message;
-									console.error(message);
-								}
-							},
-							false
-						);
-					}
-				});
-			});
-		</script>
-		<style>
-			* {
-				margin: 0;
-				padding: 0;
-				box-sizing: border-box;
-				font-weight: normal;
-				font-family: sans-serif;
-			}
+      body {
+        padding: 20px;
+      }
 
-			body {
-				padding: 20px;
-			}
+      h1,
+      h2,
+      h3 {
+        grid-column: span 2;
+      }
 
-			h1,
-			h2,
-			h3 {
-				grid-column: span 2;
-			}
+      h2 {
+        border-bottom: 1px solid lightgray;
+        margin-top: 40px;
+      }
 
-			h2 {
-				border-bottom: 1px solid lightgray;
-				margin-top: 40px;
-			}
+      #target {
+        display: grid;
+        grid-template-columns: 300px 800px;
+        gap: 20px;
+      }
 
-			#target {
-				display: grid;
-				grid-template-columns: 300px 800px;
-				gap: 20px;
-			}
+      object,
+      canvas {
+        border: 1px solid slategray;
+        grid-column: 1;
+        min-height: 300px;
+        min-width: 300px;
+      }
 
-			object,
-			canvas {
-				border: 1px solid slategray;
-				grid-column: 1;
-				min-height: 300px;
-				min-width: 300px;
-			}
-
-			textarea {
-				grid-column: 2;
-				height: 302px;
-				width: 800px;
-				font-family: 'Cascadia Code', Consolas, monospace;
-				font-size: 14px;
-			}
-		</style>
-	</head>
-	<body>
-		<div id="target">
-			<h1>SVG to Bezier - test suite</h1>
-		</div>
-	</body>
+      textarea {
+        grid-column: 2;
+        height: 302px;
+        width: 800px;
+        font-family: "Cascadia Code", Consolas, monospace;
+        font-size: 14px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="target">
+      <h1>SVG to Bezier - test suite</h1>
+    </div>
+  </body>
 </html>

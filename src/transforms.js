@@ -1,4 +1,4 @@
-import { floatSanitize, log, round } from './svg-to-bezier.js';
+import { floatSanitize, log, round } from "./svg-to-bezier.js";
 const roundValues = true;
 
 export function getTransformData(tag) {
@@ -18,29 +18,22 @@ export function getTransformData(tag) {
 	*/
 
 	// toLowerCase is called to identify these
-	const supported = [
-		'matrix',
-		'translate',
-		'scale',
-		'rotate',
-		'skewx',
-		'skewy',
-	];
+	const supported = ["matrix", "translate", "scale", "rotate", "skewx", "skewy"];
 	let transforms = false;
 	if (tag?.attributes?.transform) {
 		// log(`Detected transforms`);
-		let temp = tag.attributes.transform.replaceAll(',', ' ');
-		temp = temp.replaceAll('  ', ' ');
+		let temp = tag.attributes.transform.replaceAll(",", " ");
+		temp = temp.replaceAll("  ", " ");
 		temp = temp.toLowerCase();
-		temp = temp.split(')');
+		temp = temp.split(")");
 		transforms = [];
 		temp.forEach((value) => {
-			let data = value.split('(');
+			let data = value.split("(");
 			if (data.length === 2) {
 				data[0] = data[0].trim();
 				data[1] = data[1].trim();
 				if (supported.indexOf(data[0]) > -1) {
-					let validatedArgs = data[1].split(' ');
+					let validatedArgs = data[1].split(" ");
 					validatedArgs = validatedArgs.map((arg) => parseFloat(arg));
 					transforms.push({
 						name: data[0],
@@ -58,9 +51,9 @@ export function getTransformData(tag) {
 export function applyTransformData(bezierPaths = [], transformData = []) {
 	log(`\napplyTransformData`);
 	log(`\t P A S S E D\n`);
-	log('bezierPaths');
+	log("bezierPaths");
 	log(JSON.stringify(bezierPaths));
-	log('transformData');
+	log("transformData");
 	log(transformData);
 	const resultBezierPaths = structuredClone(bezierPaths);
 	const orderedTransforms = transformData.reverse();
@@ -79,9 +72,7 @@ export function applyTransformData(bezierPaths = [], transformData = []) {
 					// log(`\t\tbefore transform:`);
 					// logCurve(singleCurve);
 
-					resultBezierPaths[pathIndex][curveIndex] = transformCurve[
-						oneTransform.name
-					](singleCurve, oneTransform.args);
+					resultBezierPaths[pathIndex][curveIndex] = transformCurve[oneTransform.name](singleCurve, oneTransform.args);
 
 					// log(`\t\tafter transform:`);
 					// logCurve(resultBezierPaths[pathIndex][curveIndex]);
@@ -118,12 +109,8 @@ function matrixTransformCurve(curve = [], args = []) {
 		const oldX = oldPoint.x;
 		const oldY = oldPoint.y;
 		const newPoint = { x: 0, y: 0 };
-		newPoint.x = floatSanitize(
-			1 * args[0] * oldX + 1 * args[2] * oldY + 1 * args[4]
-		);
-		newPoint.y = floatSanitize(
-			1 * args[1] * oldX + 1 * args[3] * oldY + 1 * args[5]
-		);
+		newPoint.x = floatSanitize(1 * args[0] * oldX + 1 * args[2] * oldY + 1 * args[4]);
+		newPoint.y = floatSanitize(1 * args[1] * oldX + 1 * args[3] * oldY + 1 * args[5]);
 
 		if (roundValues) {
 			newPoint.x = round(newPoint.x, 3);
@@ -203,22 +190,20 @@ function scaleTransformCurve(curve = [], args = []) {
 function rotateTransformCurve(curve = [], args = []) {
 	const angle = angleToRadians(args[0]);
 	const about = { x: 0, y: 0 };
+	if (args[1]) about.x = args[1];
+	if (args[2]) about.y = args[2];
+
 	const resultCurve = [];
 	log(`\t\trotate args: ${args.toString()}`);
 	log(`\t\trotate validated: ${angle}`);
+	log(`\t\trotate about: ${about.x}, ${about.y}`);
 
-	function rotatePoint(point) {
-		if (!angle || !point) return false;
+	function calculateNewPoint(point) {
+		if (!point) return false;
 
 		const newPoint = { x: 0, y: 0 };
-		point.x -= about.x;
-		point.y -= about.y;
-
-		const newX = point.x * Math.cos(angle) - point.y * Math.sin(angle);
-		const newY = point.x * Math.sin(angle) + point.y * Math.cos(angle);
-
-		newPoint.x = floatSanitize(newX + about.x);
-		newPoint.y = floatSanitize(newY + about.y);
+		newPoint.x = floatSanitize(Math.cos(angle) * (point.x - about.x) - Math.sin(angle) * (point.y - about.y) + about.x);
+		newPoint.y = floatSanitize(Math.sin(angle) * (point.x - about.x) + Math.cos(angle) * (point.y - about.y) + about.y);
 
 		if (roundValues) {
 			newPoint.x = round(newPoint.x, 3);
@@ -230,10 +215,10 @@ function rotateTransformCurve(curve = [], args = []) {
 		return newPoint;
 	}
 
-	resultCurve[0] = rotatePoint(curve[0]);
-	resultCurve[1] = rotatePoint(curve[1]);
-	resultCurve[2] = rotatePoint(curve[2]);
-	resultCurve[3] = rotatePoint(curve[3]);
+	resultCurve[0] = calculateNewPoint(curve[0]);
+	resultCurve[1] = calculateNewPoint(curve[1]);
+	resultCurve[2] = calculateNewPoint(curve[2]);
+	resultCurve[3] = calculateNewPoint(curve[3]);
 
 	return resultCurve;
 }

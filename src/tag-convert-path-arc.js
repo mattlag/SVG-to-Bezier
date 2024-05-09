@@ -17,31 +17,13 @@
  * @param {object} subPath - for recursion, where it takes multiple Bezier curves
  * 								to describe a single Arc
  */
-export function convertArcToCommandToBezier(
-	startX,
-	startY,
-	radiusX,
-	radiusY,
-	rotationDegrees,
-	largeArcFlag,
-	sweepFlag,
-	endX,
-	endY,
-	subPath
-) {
+export function convertArcToCommandToBezier(startX, startY, radiusX, radiusY, rotationDegrees, largeArcFlag, sweepFlag, endX, endY, subPath) {
 	let startPoint = { x: startX, y: startY };
 	let endPoint = { x: endX, y: endY };
 
 	// Short circuit for straight-line edge cases
 	if ((startX === endX && startY === endY) || !radiusX || !radiusY) {
-		return [
-			startPoint.x,
-			startPoint.y,
-			endPoint.x,
-			endPoint.y,
-			endPoint.x,
-			endPoint.y,
-		];
+		return [startPoint.x, startPoint.y, endPoint.x, endPoint.y, endPoint.x, endPoint.y];
 	}
 
 	let rotationRadians = rad(rotationDegrees);
@@ -71,9 +53,7 @@ export function convertArcToCommandToBezier(
 		let halfHeight = (startPoint.y - endPoint.y) / 2;
 		let halfHeightSquared = halfHeight * halfHeight;
 		let halfWidthSquared = halfWidth * halfWidth;
-		let hyp =
-			halfWidthSquared / (radiusX * radiusX) +
-			halfHeightSquared / (radiusY * radiusY);
+		let hyp = halfWidthSquared / (radiusX * radiusX) + halfHeightSquared / (radiusY * radiusY);
 
 		if (hyp > 1) {
 			hyp = Math.sqrt(hyp);
@@ -86,20 +66,11 @@ export function convertArcToCommandToBezier(
 		let radiusYSquared = radiusY * radiusY;
 		let sign = largeArcFlag === sweepFlag ? -1 : 1;
 		sign *= Math.sqrt(
-			Math.abs(
-				(radiusXSquared * radiusYSquared -
-					radiusXSquared * halfHeightSquared -
-					radiusYSquared * halfWidthSquared) /
-					(radiusXSquared * halfHeightSquared +
-						radiusYSquared * halfWidthSquared)
-			)
+			Math.abs((radiusXSquared * radiusYSquared - radiusXSquared * halfHeightSquared - radiusYSquared * halfWidthSquared) / (radiusXSquared * halfHeightSquared + radiusYSquared * halfWidthSquared))
 		);
 
-		center.x =
-			(sign * radiusX * halfHeight) / radiusY + (startPoint.x + endPoint.x) / 2;
-		center.y =
-			(sign * -1 * radiusY * halfWidth) / radiusX +
-			(startPoint.y + endPoint.y) / 2;
+		center.x = (sign * radiusX * halfHeight) / radiusY + (startPoint.x + endPoint.x) / 2;
+		center.y = (sign * -1 * radiusY * halfWidth) / radiusX + (startPoint.y + endPoint.y) / 2;
 		angleStart = Math.asin((startPoint.y - center.y) / radiusY);
 		angleEnd = Math.asin((endPoint.y - center.y) / radiusY);
 
@@ -123,22 +94,10 @@ export function convertArcToCommandToBezier(
 		let angleEndOld = angleEnd;
 		let endPointXOld = endPoint.x;
 		let endPointYOld = endPoint.y;
-		angleEnd =
-			angleStart + threshold * (sweepFlag && angleEnd > angleStart ? 1 : -1);
+		angleEnd = angleStart + threshold * (sweepFlag && angleEnd > angleStart ? 1 : -1);
 		endPoint.x = center.x + radiusX * Math.cos(angleEnd);
 		endPoint.y = center.y + radiusY * Math.sin(angleEnd);
-		result = convertArcToCommandToBezier(
-			endPoint.x,
-			endPoint.y,
-			radiusX,
-			radiusY,
-			rotationDegrees,
-			0,
-			sweepFlag,
-			endPointXOld,
-			endPointYOld,
-			[angleEnd, angleEndOld, center.x, center.y]
-		);
+		result = convertArcToCommandToBezier(endPoint.x, endPoint.y, radiusX, radiusY, rotationDegrees, 0, sweepFlag, endPointXOld, endPointYOld, [angleEnd, angleEndOld, center.x, center.y]);
 	}
 
 	// Convert the result back to Endpoint Notation
@@ -181,15 +140,9 @@ export function convertArcToCommandToBezier(
 		// Rotate the bezier points back to their original rotated angle
 		for (let i = 0; i < result.length; i++) {
 			if (i % 2) {
-				finalResult[i] = rotate(
-					{ x: result[i - 1], y: result[i] },
-					rotationRadians
-				).y;
+				finalResult[i] = rotate({ x: result[i - 1], y: result[i] }, rotationRadians).y;
 			} else {
-				finalResult[i] = rotate(
-					{ x: result[i], y: result[i + 1] },
-					rotationRadians
-				).x;
+				finalResult[i] = rotate({ x: result[i], y: result[i + 1] }, rotationRadians).x;
 			}
 		}
 
@@ -216,14 +169,9 @@ function rotate(coord, deltaRad, about) {
 	about.x = about.x || 0;
 	about.y = about.y || 0;
 
-	coord.x -= about.x;
-	coord.y -= about.y;
+	const newPoint = { x: 0, y: 0 };
+	newPoint.x = Math.cos(deltaRad) * (coord.x - about.x) - Math.sin(deltaRad) * (coord.y - about.y) + about.x;
+	newPoint.y = Math.sin(deltaRad) * (coord.x - about.x) + Math.cos(deltaRad) * (coord.y - about.y) + about.y;
 
-	let newX = coord.x * Math.cos(deltaRad) - coord.y * Math.sin(deltaRad);
-	let newY = coord.x * Math.sin(deltaRad) + coord.y * Math.cos(deltaRad);
-
-	coord.x = newX + about.x;
-	coord.y = newY + about.y;
-
-	return coord;
+	return newPoint;
 }
