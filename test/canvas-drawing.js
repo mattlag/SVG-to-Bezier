@@ -8,7 +8,7 @@ export function drawBeziersToCanvas(bezierPaths, ctx) {
 		ctx.beginPath();
 		ctx.moveTo(path[0][0].x, path[0][0].y);
 		path.forEach((curve) => {
-			console.log(`Drawing curve: ${JSON.stringify(curve)}`);
+			// console.log(`Drawing curve: ${JSON.stringify(curve)}`);
 			let p0 = curve[0];
 			let p1 = false;
 			let p2 = false;

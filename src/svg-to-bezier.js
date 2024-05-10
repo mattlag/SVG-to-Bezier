@@ -1,8 +1,8 @@
 /*
 	SVG to Bezier
 	For more details, see: https://github.com/mattlag/SVG-to-Bezier
-
-	Version: 1.--.--
+	Also, more info on our 'Bezier Data Format' in bezier-data-format.md in this folder
+	Version: 2.0.0
 */
 
 import { tagConvertCircleEllipse } from './tag-convert-circle-ellipse.js';
@@ -12,8 +12,8 @@ import { tagConvertRect } from './tag-convert-rect.js';
 import { applyTransformData, getTransformData } from './transforms.js';
 import { XMLtoJSON } from './xml-to-json.js';
 
-export const enableConsoleLogging = true;
-export const roundToDecimalPrecision = 7;
+export const enableConsoleLogging = false;
+export const roundToDecimalPrecision = false;
 
 /**
  * Takes an input SVG document in string format, and converts it to
@@ -186,7 +186,7 @@ export function roundAndSanitize(num) {
  */
 export function round(num, dec = false) {
 	if (!num) return 0;
-	if (dec === false) return num;
+	if (dec === false) return parseFloat(num);
 	num = parseFloat(num);
 	return Number(Math.round(`${num}e${dec}`) + `e-${dec}`) || 0;
 }
