@@ -1,6 +1,12 @@
-import { floatSanitize, log, round } from "./svg-to-bezier.js";
-const roundValues = true;
+import { floatSanitize, log, round, roundToDecimalPrecision } from "./svg-to-bezier.js";
 
+/**
+ * Takes the string value of an element's "transform" attribute, and
+ * parses out each individual transform into an object containing the
+ * transform's name, and an array of the transform's arguments.
+ * @param {Object} tag - XMLtoJSON representation of a single SVG Tag
+ * @returns {Array} - Collection of objects containing individual transform names & arguments
+ */
 export function getTransformData(tag) {
 	// log(`getTransformData`);
 	/*
@@ -19,14 +25,13 @@ export function getTransformData(tag) {
 
 	// toLowerCase is called to identify these
 	const supported = ["matrix", "translate", "scale", "rotate", "skewx", "skewy"];
-	let transforms = false;
+	let transforms = [];
 	if (tag?.attributes?.transform) {
 		// log(`Detected transforms`);
 		let temp = tag.attributes.transform.replaceAll(",", " ");
 		temp = temp.replaceAll("  ", " ");
 		temp = temp.toLowerCase();
 		temp = temp.split(")");
-		transforms = [];
 		temp.forEach((value) => {
 			let data = value.split("(");
 			if (data.length === 2) {
@@ -34,7 +39,7 @@ export function getTransformData(tag) {
 				data[1] = data[1].trim();
 				if (supported.indexOf(data[0]) > -1) {
 					let validatedArgs = data[1].split(" ");
-					validatedArgs = validatedArgs.map((arg) => parseFloat(arg));
+					validatedArgs = validatedArgs.map((arg) => Number(arg));
 					transforms.push({
 						name: data[0],
 						args: validatedArgs,
@@ -48,6 +53,12 @@ export function getTransformData(tag) {
 	return transforms;
 }
 
+/**
+ * Applies transforms to data in Bezier Data Format
+ * @param {Array} bezierPaths - Collection of Bezier Paths to transform
+ * @param {Array} transformData - Collection of transforms to apply
+ * @returns {Array} - bezierPaths array
+ */
 export function applyTransformData(bezierPaths = [], transformData = []) {
 	log(`\napplyTransformData`);
 	log(`\t P A S S E D\n`);
@@ -55,14 +66,19 @@ export function applyTransformData(bezierPaths = [], transformData = []) {
 	log(JSON.stringify(bezierPaths));
 	log("transformData");
 	log(transformData);
-	const resultBezierPaths = structuredClone(bezierPaths);
-	const orderedTransforms = transformData.reverse();
+
 	log(`\t V A L I D A T E D\n`);
+	const resultBezierPaths = structuredClone(bezierPaths);
 	log(`\t RESULT BEZIER PATHS (start)\n`);
 	log(JSON.stringify(resultBezierPaths));
+
+	// Transforms get applied from right to left in the
+	// order they were included from the attribute
+	const orderedTransforms = transformData.reverse();
 	log(`\t ORDERED TRANSFORMS\n`);
 	log(JSON.stringify(orderedTransforms));
 
+	// Start transforming
 	orderedTransforms.forEach((oneTransform) => {
 		if (transformCurve[oneTransform.name]) {
 			log(`\n\t${oneTransform.name}`);
@@ -90,6 +106,7 @@ export function applyTransformData(bezierPaths = [], transformData = []) {
 		Individual transform functions
 */
 
+// Map transform names to their conversion function
 const transformCurve = {
 	matrix: matrixTransformCurve,
 	translate: translateTransformCurve,
@@ -104,7 +121,7 @@ function matrixTransformCurve(curve = [], args = []) {
 	while (args.length < 6) args.push(0);
 	log(`\t\tmatrix: ${args.toString()}`);
 
-	function matrixTransformPoint(oldPoint) {
+	function calculateNewPoint(oldPoint) {
 		if (oldPoint === false) return false;
 		const oldX = oldPoint.x;
 		const oldY = oldPoint.y;
@@ -112,18 +129,16 @@ function matrixTransformCurve(curve = [], args = []) {
 		newPoint.x = floatSanitize(1 * args[0] * oldX + 1 * args[2] * oldY + 1 * args[4]);
 		newPoint.y = floatSanitize(1 * args[1] * oldX + 1 * args[3] * oldY + 1 * args[5]);
 
-		if (roundValues) {
-			newPoint.x = round(newPoint.x, 3);
-			newPoint.y = round(newPoint.y, 3);
-		}
+		newPoint.x = round(newPoint.x, roundToDecimalPrecision);
+		newPoint.y = round(newPoint.y, roundToDecimalPrecision);
 
 		return newPoint;
 	}
 
-	resultCurve[0] = matrixTransformPoint(curve[0]);
-	resultCurve[1] = matrixTransformPoint(curve[1]);
-	resultCurve[2] = matrixTransformPoint(curve[2]);
-	resultCurve[3] = matrixTransformPoint(curve[3]);
+	resultCurve[0] = calculateNewPoint(curve[0]);
+	resultCurve[1] = calculateNewPoint(curve[1]);
+	resultCurve[2] = calculateNewPoint(curve[2]);
+	resultCurve[3] = calculateNewPoint(curve[3]);
 
 	return resultCurve;
 }
@@ -141,10 +156,8 @@ function translateTransformCurve(curve = [], args = {}) {
 		newPoint.x = floatSanitize(oldPoint.x + dx);
 		newPoint.y = floatSanitize(oldPoint.y + dy);
 
-		if (roundValues) {
-			newPoint.x = round(newPoint.x, 3);
-			newPoint.y = round(newPoint.y, 3);
-		}
+		newPoint.x = round(newPoint.x, roundToDecimalPrecision);
+		newPoint.y = round(newPoint.y, roundToDecimalPrecision);
 
 		return newPoint;
 	}
@@ -171,10 +184,8 @@ function scaleTransformCurve(curve = [], args = []) {
 		newPoint.x = floatSanitize(oldPoint.x * scaleX);
 		newPoint.y = floatSanitize(oldPoint.y * scaleY);
 
-		if (roundValues) {
-			newPoint.x = round(newPoint.x, 3);
-			newPoint.y = round(newPoint.y, 3);
-		}
+		newPoint.x = round(newPoint.x, roundToDecimalPrecision);
+		newPoint.y = round(newPoint.y, roundToDecimalPrecision);
 
 		return newPoint;
 	}
@@ -205,10 +216,8 @@ function rotateTransformCurve(curve = [], args = []) {
 		newPoint.x = floatSanitize(Math.cos(angle) * (point.x - about.x) - Math.sin(angle) * (point.y - about.y) + about.x);
 		newPoint.y = floatSanitize(Math.sin(angle) * (point.x - about.x) + Math.cos(angle) * (point.y - about.y) + about.y);
 
-		if (roundValues) {
-			newPoint.x = round(newPoint.x, 3);
-			newPoint.y = round(newPoint.y, 3);
-		}
+		newPoint.x = round(newPoint.x, roundToDecimalPrecision);
+		newPoint.y = round(newPoint.y, roundToDecimalPrecision);
 
 		// log(newPoint);
 		// log('rotate', 'end');
@@ -238,10 +247,8 @@ function skewxTransformCurve(curve = [], args = []) {
 		newPoint.x = floatSanitize(oldX + yMultiplier * oldY);
 		newPoint.y = floatSanitize(oldY);
 
-		if (roundValues) {
-			newPoint.x = round(newPoint.x, 3);
-			newPoint.y = round(newPoint.y, 3);
-		}
+		newPoint.x = round(newPoint.x, roundToDecimalPrecision);
+		newPoint.y = round(newPoint.y, roundToDecimalPrecision);
 
 		return newPoint;
 	}
@@ -269,10 +276,8 @@ function skewyTransformCurve(curve = [], args = []) {
 		newPoint.x = floatSanitize(oldX);
 		newPoint.y = floatSanitize(oldY + xMultiplier * oldX);
 
-		if (roundValues) {
-			newPoint.x = round(newPoint.x, 3);
-			newPoint.y = round(newPoint.y, 3);
-		}
+		newPoint.x = round(newPoint.x, roundToDecimalPrecision);
+		newPoint.y = round(newPoint.y, roundToDecimalPrecision);
 
 		return newPoint;
 	}
@@ -299,7 +304,7 @@ function logCurve(curve) {
 }
 
 /*
-	SAMPLE
+	SAMPLE BEZIER DATA FORMAT
 
 	[
 		[

@@ -153,25 +153,35 @@ export function convertArcToCommandToBezier(startX, startY, radiusX, radiusY, ro
 /*
  * Helper Functions
  */
-// Convert between degrees and radians
-// 0rad = 0deg, PIrad = 180deg
+
+/**
+ * Converts degrees to radians
+ * 0rad = 0deg, PIrad = 180deg
+ * @param {Number} deg - degrees in 360 format
+ * @returns {Number} - degrees in radians
+ */
 function rad(deg) {
 	return deg * (Math.PI / 180);
 }
 
-// Rotate a coordinate point a certain number of Radians
-// Optionally about a different coordinate point
-function rotate(coord, deltaRad, about) {
-	if (!coord) return;
-	if (deltaRad === 0) return coord;
+/**
+ * Rotates a point a certain number of degrees around another point
+ * @param {Object} point - x/y point to rotate
+ * @param {Number} deltaRad - Angle to rotate in radians
+ * @param {Object} about - x/y point to rotate around (default is 0,0)
+ * @returns {Object} - x/y point
+ */
+function rotate(point, deltaRad, about) {
+	if (!point) return;
+	if (deltaRad === 0) return point;
 
 	about = about || {};
 	about.x = about.x || 0;
 	about.y = about.y || 0;
 
 	const newPoint = { x: 0, y: 0 };
-	newPoint.x = Math.cos(deltaRad) * (coord.x - about.x) - Math.sin(deltaRad) * (coord.y - about.y) + about.x;
-	newPoint.y = Math.sin(deltaRad) * (coord.x - about.x) + Math.cos(deltaRad) * (coord.y - about.y) + about.y;
+	newPoint.x = Math.cos(deltaRad) * (point.x - about.x) - Math.sin(deltaRad) * (point.y - about.y) + about.x;
+	newPoint.y = Math.sin(deltaRad) * (point.x - about.x) + Math.cos(deltaRad) * (point.y - about.y) + about.y;
 
 	return newPoint;
 }

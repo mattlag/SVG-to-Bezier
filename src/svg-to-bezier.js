@@ -36,6 +36,7 @@ import { applyTransformData, getTransformData } from "./transforms.js";
 import { XMLtoJSON } from "./xml-to-json.js";
 
 export const enableConsoleLogging = true;
+export const roundToDecimalPrecision = 3;
 
 /**
  * Takes an input SVG document in string format, and converts it to
@@ -67,7 +68,6 @@ function convertTags(tagData) {
 	if (!tagData?.content) return [];
 
 	let resultBezierPaths = [];
-	const transformData = getTransformData(tagData);
 
 	tagData.content.forEach((tag) => {
 		log(`\n\n\n<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n START TAG ${tag.name}`);
@@ -93,11 +93,6 @@ function convertTags(tagData) {
 
 		log(`>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n END TAG ${tag.name}\n\n\n\n`);
 	});
-
-	// if (transformData) {
-	// 	log(`transforming ${tagData.name}`);
-	// 	resultBezierPaths = applyTransformData(resultBezierPaths, transformData);
-	// }
 
 	log(`resultBezierPaths`);
 	log(resultBezierPaths);
@@ -201,12 +196,20 @@ export function chunkAndValidateParameters(data = "") {
  * @param {Number} dec - number of decimal places
  * @returns {Number}
  */
-export function round(num, dec = 0) {
+export function round(num, dec = false) {
 	if (!num) return 0;
+	if (dec === false) return num;
 	num = parseFloat(num);
 	return Number(Math.round(`${num}e${dec}`) + `e-${dec}`) || 0;
 }
 
+/**
+ * Gets rid of those annoying floating point results that contain
+ * long sequences of 0s or 9s, and are really close to another
+ * much more simple number.
+ * @param {Number} num - number to sanitize
+ * @returns {Number}
+ */
 export function floatSanitize(num) {
 	const stringNum = String(num);
 	if (stringNum.indexOf("00000") > -1 || stringNum.indexOf("99999") > -1) {
@@ -215,6 +218,10 @@ export function floatSanitize(num) {
 	return num;
 }
 
+/**
+ * Global switch for console logging
+ * @param {String} message - text to log
+ */
 export function log(message) {
 	if (enableConsoleLogging) console.log(message);
 }
