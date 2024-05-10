@@ -1,7 +1,7 @@
 import {
 	chunkAndValidateParameters,
+	roundAndSanitize,
 	sanitizeParameterData,
-	log,
 } from './svg-to-bezier.js';
 import { convertArcToCommandToBezier } from './tag-convert-path-arc.js';
 
@@ -62,29 +62,32 @@ function convertCommandsToBezierPaths(commands) {
 	// The only commands should be M, C, L, Z
 	// Commands should not be chained
 	commands.forEach((command) => {
+		const params = command.parameters || [];
+		params.forEach((param, i) => (params[i] = roundAndSanitize(param)));
+
 		if (command.type === 'M') {
-			currentX = command.parameters[0];
-			currentY = command.parameters[1];
+			currentX = params[0];
+			currentY = params[1];
 		}
 		if (command.type === 'L') {
 			currentPath.push([
 				{ x: currentX, y: currentY },
 				false,
 				false,
-				{ x: command.parameters[0], y: command.parameters[1] },
+				{ x: params[0], y: params[1] },
 			]);
-			currentX = command.parameters[0];
-			currentY = command.parameters[1];
+			currentX = params[0];
+			currentY = params[1];
 		}
 		if (command.type === 'C') {
 			currentPath.push([
 				{ x: currentX, y: currentY },
-				{ x: command.parameters[0], y: command.parameters[1] },
-				{ x: command.parameters[2], y: command.parameters[3] },
-				{ x: command.parameters[4], y: command.parameters[5] },
+				{ x: params[0], y: params[1] },
+				{ x: params[2], y: params[3] },
+				{ x: params[4], y: params[5] },
 			]);
-			currentX = command.parameters[4];
-			currentY = command.parameters[5];
+			currentX = params[4];
+			currentY = params[5];
 		}
 		if (command.type === 'Z') {
 			bezierPaths.push(currentPath);
@@ -130,9 +133,7 @@ function chunkCommands(dAttribute) {
 		if (isCommand(data.charAt(i))) {
 			result.push({
 				type: data.charAt(commandStart),
-				parameters: chunkAndValidateParameters(
-					data.substring(commandStart + 1, i)
-				),
+				parameters: chunkAndValidateParameters(data.substring(commandStart + 1, i)),
 			});
 
 			commandStart = i;
@@ -143,9 +144,7 @@ function chunkCommands(dAttribute) {
 	if (commandStart < data.length - 1) {
 		result.push({
 			type: data.charAt(commandStart),
-			parameters: chunkAndValidateParameters(
-				data.substring(commandStart + 1, data.length)
-			),
+			parameters: chunkAndValidateParameters(data.substring(commandStart + 1, data.length)),
 		});
 	}
 
