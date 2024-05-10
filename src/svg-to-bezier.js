@@ -13,7 +13,7 @@ import { applyTransformData, getTransformData } from "./transforms.js";
 import { XMLtoJSON } from "./xml-to-json.js";
 
 export const enableConsoleLogging = true;
-export const roundToDecimalPrecision = 3;
+export const roundToDecimalPrecision = 7;
 
 /**
  * Takes an input SVG document in string format, and converts it to
