@@ -1,31 +1,8 @@
 /*
 	SVG to Bezier
 	For more details, see: https://github.com/mattlag/SVG-to-Bezier
+
 	Version: 1.--.--
-	
-	=================================================================
-
-	"Bezier Data Format"
-
-	- Point
-		// simple x/y object
-		{x: Number, y: Number}
-
-	- Bezier curve (Collection of 2 or 4 points)
-		// 'Regular' Bezier curve notation
-		[point0, point1, point2, point3]
-		or
-			// straight lines have no point1 or point2
-		[point0, false, false, point3]
-
-	- Path (collection of Bezier curves)
-		// where point3 of bezier(n) should equal point0 of bezier(n+1)
-		[bezier1, bezier2, ...] 
-
-	- Bezier Paths (collection of Paths)
-		[path1, path2, ...]
-
-	=================================================================
 */
 
 import { tagConvertCircleEllipse } from "./tag-convert-circle-ellipse.js";
@@ -188,6 +165,17 @@ export function chunkAndValidateParameters(data = "") {
 	}
 
 	return validatedParameters;
+}
+
+/**
+ * One call for floating point sanitize and global rounding
+ * @param {Number} num - number to sanitize
+ * @returns {Number}
+ */
+export function roundAndSanitize(num) {
+	num = floatSanitize(num);
+	num = round(num, roundToDecimalPrecision);
+	return num;
 }
 
 /**

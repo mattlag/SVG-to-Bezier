@@ -1,4 +1,4 @@
-import { floatSanitize, log, round, roundToDecimalPrecision } from "./svg-to-bezier.js";
+import { log, roundAndSanitize } from "./svg-to-bezier.js";
 
 /**
  * Takes the string value of an element's "transform" attribute, and
@@ -126,11 +126,8 @@ function matrixTransformCurve(curve = [], args = []) {
 		const oldX = oldPoint.x;
 		const oldY = oldPoint.y;
 		const newPoint = { x: 0, y: 0 };
-		newPoint.x = floatSanitize(1 * args[0] * oldX + 1 * args[2] * oldY + 1 * args[4]);
-		newPoint.y = floatSanitize(1 * args[1] * oldX + 1 * args[3] * oldY + 1 * args[5]);
-
-		newPoint.x = round(newPoint.x, roundToDecimalPrecision);
-		newPoint.y = round(newPoint.y, roundToDecimalPrecision);
+		newPoint.x = roundAndSanitize(1 * args[0] * oldX + 1 * args[2] * oldY + 1 * args[4]);
+		newPoint.y = roundAndSanitize(1 * args[1] * oldX + 1 * args[3] * oldY + 1 * args[5]);
 
 		return newPoint;
 	}
@@ -153,11 +150,8 @@ function translateTransformCurve(curve = [], args = {}) {
 	function calculateNewPoint(oldPoint) {
 		if (oldPoint === false) return false;
 		const newPoint = { x: 0, y: 0 };
-		newPoint.x = floatSanitize(oldPoint.x + dx);
-		newPoint.y = floatSanitize(oldPoint.y + dy);
-
-		newPoint.x = round(newPoint.x, roundToDecimalPrecision);
-		newPoint.y = round(newPoint.y, roundToDecimalPrecision);
+		newPoint.x = roundAndSanitize(oldPoint.x + dx);
+		newPoint.y = roundAndSanitize(oldPoint.y + dy);
 
 		return newPoint;
 	}
@@ -181,11 +175,8 @@ function scaleTransformCurve(curve = [], args = []) {
 	function calculateNewPoint(oldPoint) {
 		if (oldPoint === false) return false;
 		const newPoint = { x: 0, y: 0 };
-		newPoint.x = floatSanitize(oldPoint.x * scaleX);
-		newPoint.y = floatSanitize(oldPoint.y * scaleY);
-
-		newPoint.x = round(newPoint.x, roundToDecimalPrecision);
-		newPoint.y = round(newPoint.y, roundToDecimalPrecision);
+		newPoint.x = roundAndSanitize(oldPoint.x * scaleX);
+		newPoint.y = roundAndSanitize(oldPoint.y * scaleY);
 
 		return newPoint;
 	}
@@ -213,11 +204,8 @@ function rotateTransformCurve(curve = [], args = []) {
 		if (!point) return false;
 
 		const newPoint = { x: 0, y: 0 };
-		newPoint.x = floatSanitize(Math.cos(angle) * (point.x - about.x) - Math.sin(angle) * (point.y - about.y) + about.x);
-		newPoint.y = floatSanitize(Math.sin(angle) * (point.x - about.x) + Math.cos(angle) * (point.y - about.y) + about.y);
-
-		newPoint.x = round(newPoint.x, roundToDecimalPrecision);
-		newPoint.y = round(newPoint.y, roundToDecimalPrecision);
+		newPoint.x = roundAndSanitize(Math.cos(angle) * (point.x - about.x) - Math.sin(angle) * (point.y - about.y) + about.x);
+		newPoint.y = roundAndSanitize(Math.sin(angle) * (point.x - about.x) + Math.cos(angle) * (point.y - about.y) + about.y);
 
 		// log(newPoint);
 		// log('rotate', 'end');
@@ -244,11 +232,8 @@ function skewxTransformCurve(curve = [], args = []) {
 		const oldY = oldPoint.y;
 		const newPoint = { x: 0, y: 0 };
 
-		newPoint.x = floatSanitize(oldX + yMultiplier * oldY);
-		newPoint.y = floatSanitize(oldY);
-
-		newPoint.x = round(newPoint.x, roundToDecimalPrecision);
-		newPoint.y = round(newPoint.y, roundToDecimalPrecision);
+		newPoint.x = roundAndSanitize(oldX + yMultiplier * oldY);
+		newPoint.y = roundAndSanitize(oldY);
 
 		return newPoint;
 	}
@@ -273,11 +258,8 @@ function skewyTransformCurve(curve = [], args = []) {
 		const oldY = oldPoint.y;
 		const newPoint = { x: 0, y: 0 };
 
-		newPoint.x = floatSanitize(oldX);
-		newPoint.y = floatSanitize(oldY + xMultiplier * oldX);
-
-		newPoint.x = round(newPoint.x, roundToDecimalPrecision);
-		newPoint.y = round(newPoint.y, roundToDecimalPrecision);
+		newPoint.x = roundAndSanitize(oldX);
+		newPoint.y = roundAndSanitize(oldY + xMultiplier * oldX);
 
 		return newPoint;
 	}
@@ -302,26 +284,3 @@ function logCurve(curve) {
 		y: [curve[0].y, curve[1]?.y, curve[2]?.y, curve[3].y],
 	});
 }
-
-/*
-	SAMPLE BEZIER DATA FORMAT
-
-	[
-		[
-			[{"x":10,"y":30},{"x":10,"y":14},{"x":26,"y":4},{"x":40,"y":12}],
-			[{"x":40,"y":12},{"x":46,"y":16},{"x":50,"y":22},{"x":50,"y":30}],
-			[{"x":50,"y":30},{"x":50,"y":14},{"x":66,"y":4},{"x":80,"y":12}],
-			[{"x":80,"y":12},{"x":86,"y":16},{"x":90,"y":22},{"x":90,"y":30}],
-			[{"x":90,"y":30},{"x":90,"y":50},{"x":76,"y":70},{"x":50,"y":90}],
-			[{"x":50,"y":90},{"x":23,"y":70},{"x":10,"y":50},{"x":10,"y":30}]
-		],
-		[
-			[{"x":10,"y":30},{"x":10,"y":14},{"x":26,"y":4},{"x":40,"y":12}],
-			[{"x":40,"y":12},{"x":46,"y":16},{"x":50,"y":22},{"x":50,"y":30}],
-			[{"x":50,"y":30},{"x":50,"y":14},{"x":66,"y":4},{"x":80,"y":12}],
-			[{"x":80,"y":12},{"x":86,"y":16},{"x":90,"y":22},{"x":90,"y":30}],
-			[{"x":90,"y":30},{"x":90,"y":50},{"x":76,"y":70},{"x":50,"y":90}],
-			[{"x":50,"y":90},{"x":23,"y":70},{"x":10,"y":50},{"x":10,"y":30}]
-		]
-	]
-*/

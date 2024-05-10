@@ -1,3 +1,5 @@
+import { roundAndSanitize } from "./svg-to-bezier.js";
+
 /**
  * Converts a curve in Arc notation to Cubic Bezier Curve notation.
  * This is recursive, as it may take more than one Bezier curve to describe
@@ -133,8 +135,9 @@ export function convertArcToCommandToBezier(startX, startY, radiusX, radiusY, ro
 
 	result = [p2.x, p2.y, p3.x, p3.y, p4.x, p4.y].concat(result);
 
-	if (subPath) return result;
-	else {
+	if (subPath) {
+		return result;
+	} else {
 		let finalResult = [];
 
 		// Rotate the bezier points back to their original rotated angle
@@ -144,6 +147,7 @@ export function convertArcToCommandToBezier(startX, startY, radiusX, radiusY, ro
 			} else {
 				finalResult[i] = rotate({ x: result[i], y: result[i + 1] }, rotationRadians).x;
 			}
+			finalResult[i] = roundAndSanitize(finalResult[i]);
 		}
 
 		return finalResult;

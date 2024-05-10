@@ -1,4 +1,4 @@
-import { chunkAndValidateParameters, floatSanitize, round, roundToDecimalPrecision, sanitizeParameterData } from "./svg-to-bezier.js";
+import { chunkAndValidateParameters, roundAndSanitize, sanitizeParameterData } from "./svg-to-bezier.js";
 import { convertArcToCommandToBezier } from "./tag-convert-path-arc.js";
 
 /**
@@ -59,10 +59,7 @@ function convertCommandsToBezierPaths(commands) {
 	// Commands should not be chained
 	commands.forEach((command) => {
 		const params = command.parameters || [];
-		params.forEach((param, i) => {
-			params[i] = floatSanitize(param);
-			params[i] = round(params[i], roundToDecimalPrecision);
-		});
+		params.forEach((param, i) => (params[i] = roundAndSanitize(param)));
 
 		if (command.type === "M") {
 			currentX = params[0];
