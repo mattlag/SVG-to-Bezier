@@ -1,4 +1,4 @@
-import { roundAndSanitize } from "./svg-to-bezier.js";
+import { roundAndSanitize } from './svg-to-bezier.js';
 
 /**
  * Converts an SVG Circle or Ellipse tags to Bezier Data Format

@@ -4,7 +4,7 @@ export function drawBeziersToCanvas(bezierPaths, ctx) {
 	ctx.lineWidth = 1;
 	bezierPaths.forEach((path) => {
 		const pathAccentColor = `hsl(${Math.floor(Math.random() * 360)}, 80%, 40%)`;
-		ctx.font = "8px Verdana";
+		ctx.font = '8px Verdana';
 		ctx.beginPath();
 		ctx.moveTo(path[0][0].x, path[0][0].y);
 		path.forEach((curve) => {
@@ -31,7 +31,7 @@ export function drawBeziersToCanvas(bezierPaths, ctx) {
 		ctx.strokeStyle = pathAccentColor;
 		ctx.stroke();
 		ctx.closePath();
-		ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
+		ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
 		ctx.fill();
 	});
 }

@@ -5,12 +5,12 @@
 	Version: 1.--.--
 */
 
-import { tagConvertCircleEllipse } from "./tag-convert-circle-ellipse.js";
-import { tagConvertPath } from "./tag-convert-path.js";
-import { tagConvertPolygonPolyline } from "./tag-convert-polygon-polyline.js";
-import { tagConvertRect } from "./tag-convert-rect.js";
-import { applyTransformData, getTransformData } from "./transforms.js";
-import { XMLtoJSON } from "./xml-to-json.js";
+import { tagConvertCircleEllipse } from './tag-convert-circle-ellipse.js';
+import { tagConvertPath } from './tag-convert-path.js';
+import { tagConvertPolygonPolyline } from './tag-convert-polygon-polyline.js';
+import { tagConvertRect } from './tag-convert-rect.js';
+import { applyTransformData, getTransformData } from './transforms.js';
+import { XMLtoJSON } from './xml-to-json.js';
 
 export const enableConsoleLogging = true;
 export const roundToDecimalPrecision = 7;
@@ -40,7 +40,7 @@ export function SVGtoBezier(inputSVG) {
  */
 function convertTags(tagData) {
 	log(`\n\nCONVERT TAGS - START ${tagData.name}`);
-	log("tagData");
+	log('tagData');
 	log(tagData);
 	if (!tagData?.content) return [];
 
@@ -48,7 +48,7 @@ function convertTags(tagData) {
 
 	tagData.content.forEach((tag) => {
 		log(`\n\n\n<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n START TAG ${tag.name}`);
-		log("tag");
+		log('tag');
 		log(tag);
 
 		const name = tag.name.toLowerCase();
@@ -102,24 +102,24 @@ const convert = {
  */
 export function sanitizeParameterData(data) {
 	// Clean up whitespace and replace with commas
-	data = data.replace(/\s+/g, ",");
+	data = data.replace(/\s+/g, ',');
 
 	// Clean up numbers
 	//		Maintain scientific notation e+ and e- numbers
 	//		Commas before all negative numbers
 	//		Remove + to denote positive numbers
-	data = data.replace(/e/gi, "e");
+	data = data.replace(/e/gi, 'e');
 
-	data = data.replace(/e-/g, "~~~");
-	data = data.replace(/-/g, ",-");
-	data = data.replace(/~~~/g, "e-");
+	data = data.replace(/e-/g, '~~~');
+	data = data.replace(/-/g, ',-');
+	data = data.replace(/~~~/g, 'e-');
 
-	data = data.replace(/e\+/g, "~~~");
-	data = data.replace(/\+/g, ",");
-	data = data.replace(/~~~/g, "e+");
+	data = data.replace(/e\+/g, '~~~');
+	data = data.replace(/\+/g, ',');
+	data = data.replace(/~~~/g, 'e+');
 
 	// Clean up commas
-	data = data.replace(/,+/g, ",");
+	data = data.replace(/,+/g, ',');
 
 	return data;
 }
@@ -131,28 +131,28 @@ export function sanitizeParameterData(data) {
  * @param {String} data - data from an attribute, hopefully numbers separated by commas
  * @returns {Array} individual parameters chunked into an array
  */
-export function chunkAndValidateParameters(data = "") {
+export function chunkAndValidateParameters(data = '') {
 	// Validate and chunk numeric data
 	let validatedParameters = [];
 
-	if (data.charAt(0) === ",") {
+	if (data.charAt(0) === ',') {
 		data = data.substring(1);
 	}
 
-	if (data.charAt(data.length - 1) === ",") {
+	if (data.charAt(data.length - 1) === ',') {
 		data = data.substring(0, data.length - 1);
 	}
 
 	if (data.length > 0) {
-		data = data.split(",");
+		data = data.split(',');
 
 		// Handle sequence of decimal numbers without spaces or leading zeros
 		// like: 123.45.67.89 should be 123.45, 0.67, 0.89
 		data.forEach((param) => {
-			param = param.split(".");
+			param = param.split('.');
 
 			if (param.length === 1) validatedParameters.push(Number(param[0]));
-			else if (param.length === 2) validatedParameters.push(Number(param.join(".")));
+			else if (param.length === 2) validatedParameters.push(Number(param.join('.')));
 			else if (param.length > 2) {
 				validatedParameters.push(Number(`${param[0]}.${param[1]}`));
 				for (let p = 2; p < param.length; p++) {
@@ -200,7 +200,7 @@ export function round(num, dec = false) {
  */
 export function floatSanitize(num) {
 	const stringNum = String(num);
-	if (stringNum.indexOf("00000") > -1 || stringNum.indexOf("99999") > -1) {
+	if (stringNum.indexOf('00000') > -1 || stringNum.indexOf('99999') > -1) {
 		num = round(num, 5);
 	}
 	return num;

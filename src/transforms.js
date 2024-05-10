@@ -1,4 +1,4 @@
-import { log, roundAndSanitize } from "./svg-to-bezier.js";
+import { log, roundAndSanitize } from './svg-to-bezier.js';
 
 /**
  * Takes the string value of an element's "transform" attribute, and
@@ -21,23 +21,23 @@ export function getTransformData(tag) {
 		skewX(a) 						// default (0)
 		skewY(a) 						// default (0)
 	*/
-	const supported = ["matrix", "translate", "scale", "rotate", "skewx", "skewy"];
+	const supported = ['matrix', 'translate', 'scale', 'rotate', 'skewx', 'skewy'];
 	let transforms = [];
 	let temp;
 	let validatedArgs;
 	if (tag.attributes?.transform) {
 		// log(`Detected transforms`);
-		temp = tag.attributes.transform.replaceAll(",", " ");
-		temp = temp.replaceAll("  ", " ");
+		temp = tag.attributes.transform.replaceAll(',', ' ');
+		temp = temp.replaceAll('  ', ' ');
 		temp = temp.toLowerCase();
-		temp = temp.split(")");
+		temp = temp.split(')');
 		temp.forEach((value) => {
-			let data = value.split("(");
+			let data = value.split('(');
 			if (data.length === 2) {
 				data[0] = data[0].trim();
 				data[1] = data[1].trim();
 				if (supported.indexOf(data[0]) > -1) {
-					validatedArgs = data[1].split(" ");
+					validatedArgs = data[1].split(' ');
 					validatedArgs = validatedArgs.map((arg) => Number(arg));
 					transforms.push({
 						name: data[0],
@@ -53,15 +53,15 @@ export function getTransformData(tag) {
 		ignore keyword values
 		(x, y, z) // default to 0,0 - ignore z value
 	*/
-	if (tag.attributes["transform-origin"]) {
+	if (tag.attributes['transform-origin']) {
 		log(`Detected transform origin`);
-		temp = tag.attributes["transform-origin"];
-		temp = temp.replaceAll(",", " ");
-		temp = temp.replaceAll("  ", " ");
-		validatedArgs = temp.split(" ");
+		temp = tag.attributes['transform-origin'];
+		temp = temp.replaceAll(',', ' ');
+		temp = temp.replaceAll('  ', ' ');
+		validatedArgs = temp.split(' ');
 		validatedArgs = validatedArgs.map((arg) => Number(arg));
 		transforms.push({
-			name: "origin",
+			name: 'origin',
 			args: validatedArgs,
 		});
 	}
@@ -80,9 +80,9 @@ export function getTransformData(tag) {
 export function applyTransformData(bezierPaths = [], transformData = []) {
 	log(`\napplyTransformData`);
 	log(`\t P A S S E D\n`);
-	log("bezierPaths");
+	log('bezierPaths');
 	log(JSON.stringify(bezierPaths));
-	log("transformData");
+	log('transformData');
 	log(transformData);
 
 	log(`\t V A L I D A T E D\n`);
@@ -95,7 +95,7 @@ export function applyTransformData(bezierPaths = [], transformData = []) {
 	let orderedTransforms = transformData.reverse();
 	let originData = [0, 0];
 	for (let t = 0; t < orderedTransforms.length; t++) {
-		if (orderedTransforms[t].name === "origin") {
+		if (orderedTransforms[t].name === 'origin') {
 			originData = orderedTransforms.splice(t, 1);
 			originData = originData[0].args;
 			break;
