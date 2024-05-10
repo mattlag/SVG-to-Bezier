@@ -4,7 +4,7 @@ Convert SVG shape tags to their cubic Bézier equivalent.
 
 ## Purpose
 
-This is meant to be a fairly complete (but not 100%) way to dump an entire
+This is meant to be a fairly complete way to dump an entire
 SVG document in, and get a set of Bezier curves out. SVG has _a lot_ of features,
 including things like colors, transforms, masks... many of these things do not really
 make sense if we're just wanting to extract Bezier curves out of some vector information.
@@ -21,10 +21,9 @@ The following tags and attributes are supported. Default values are shown for at
 - `<polyline points="">`
 - `<rect x="0" y="0" width="100" height="100">`
 
-## Notable exceptions
+The `transform` and `transform-origin` attributes are also supported.
 
-For the moment, the `transform` attribute is not supported - meaning whatever
-raw data is pulled from each local attribute will be the number used.
+## Notable exceptions
 
 Supported tags that exist within nested `<g>` tags will be processed, but the
 overall result will be 'flattened' / grouping will be lost.
