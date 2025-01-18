@@ -23,6 +23,8 @@ The following tags and attributes are supported. Default values are shown for at
 
 The `transform` and `transform-origin` attributes are also supported.
 
+Linking via `<use>` tags is supported.
+
 ## Notable exceptions
 
 Supported tags that exist within nested `<g>` tags will be processed, but the
