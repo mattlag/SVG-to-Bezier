@@ -12,7 +12,7 @@ import { tagConvertRect } from './tag-convert-rect.js';
 import { applyTransformData, getTransformData } from './transforms.js';
 import { XMLtoJSON } from './xml-to-json.js';
 
-export const enableConsoleLogging = true;
+export const enableConsoleLogging = false;
 export const roundToDecimalPrecision = false;
 
 /**
@@ -62,7 +62,7 @@ function convertTags(tagData, svgDocumentData) {
 				name = 'g';
 				if (id.charAt(0) === '#') id = id.substring(1);
 				tag.content = getCopyOfTagByID(id, svgDocumentData);
-
+				if(!tag.attributes.transform) tag.attributes.transform = '';
 				tag.attributes.transform += `translate(${tag.attributes.x || 0}, ${tag.attributes.y || 0})`;
 			}
 		}

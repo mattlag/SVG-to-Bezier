@@ -1,14 +1,14 @@
 export const enabledTestCategories = {
+	'Basic Shapes': true,
+	'Multi-tag Shapes': true,
+	'Path Commands': true,
+	'Complex Paths': true,
+	'Single Transform': true,
+	'Multi Transforms': true,
+	'Inherited Transforms': true,
+	'Transform Origin': true,
 	'Use Links': true,
-	'Basic Shapes': false,
-	'Multi-tag Shapes': false,
-	'Path Commands': false,
-	'Complex Paths': false,
-	'Single Transform': false,
-	'Multi Transforms': false,
-	'Inherited Transforms': false,
-	'Transform Origin': false,
-	'Font Glyphs': false,
+	'Font Glyphs': true,
 	'Edge Cases': false,
 };
 
