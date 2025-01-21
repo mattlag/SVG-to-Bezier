@@ -46,6 +46,7 @@ export const testFiles = [
 	{ category: 'Complex Paths', name: 'multi_shape_3' },
 	{ category: 'Complex Paths', name: 'multi_shape_4' },
 	{ category: 'Complex Paths', name: 'multi_shape_5' },
+	{ category: 'Complex Paths', name: 'multi_shape_6' },
 	{ category: 'Single Transform', name: 'transform_matrix' },
 	{ category: 'Single Transform', name: 'transform_translate' },
 	{ category: 'Single Transform', name: 'transform_scale' },
