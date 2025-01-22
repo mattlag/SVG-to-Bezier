@@ -15,7 +15,7 @@ import { XMLtoJSON } from './xml-to-json.js';
 /**
  * Global settings
  */
-export const enableConsoleLogging = true;
+export const enableConsoleLogging = false;
 export const roundToDecimalPrecision = false;
 
 /**

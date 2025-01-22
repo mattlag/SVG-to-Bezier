@@ -201,7 +201,10 @@ function convertToAbsolute(commands) {
 				newCommand.parameters.push(newPoint.y);
 				currentPoint.x = newPoint.x;
 				currentPoint.y = newPoint.y;
-				setFirstPoint(newPoint);
+				if (command.type === 'm') {
+					// if a chained m command, firstPoint is the first entry
+					setFirstPoint(newPoint);
+				}
 			}
 
 			result.push(newCommand);
@@ -347,7 +350,12 @@ function convertToAbsolute(commands) {
 			firstPoint = false;
 			result.push({ type: 'Z' });
 		} else {
-			// command is absolute, push it
+			// command is absolute, push it after updating currentPoint
+			if (command.type === 'M') {
+				// If a chained M command, firstPoint is the first entry
+				currentPoint.x = command.parameters[0];
+				currentPoint.y = command.parameters[1];
+			}
 			result.push(command);
 			setFirstPoint(currentPoint);
 			currentPoint = getNewEndPoint(currentPoint, command);
@@ -664,7 +672,7 @@ function convertArcs(commands) {
  */
 let firstPoint = {};
 function setFirstPoint(point) {
-	if (!firstPoint.x && !firstPoint.y) {
+	if (!firstPoint.hasOwnProperty('x') && !firstPoint.hasOwnProperty('y')) {
 		log(`Setting First Point! ${point.x}, ${point.y}`);
 		firstPoint = {
 			x: point.x,
