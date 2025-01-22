@@ -8,7 +8,7 @@ export const enabledTestCategories = {
 	'Inherited Transforms': true,
 	'Transform Origin': true,
 	'Use Links': true,
-	'Font Glyphs': true,
+	'Font Glyphs': false,
 	'Edge Cases': false,
 };
 

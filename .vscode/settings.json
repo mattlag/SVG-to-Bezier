@@ -1,8 +1,4 @@
 {
-	"cSpell.words": [
-		"Bezier",
-		"Bézier",
-		"Beziers",
-		"Glyphr"
-	]
+	"cSpell.words": ["Bezier", "Bézier", "Beziers", "Glyphr"],
+	"svg.preview.background": "white"
 }

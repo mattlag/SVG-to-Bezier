@@ -104,6 +104,14 @@ function convertCommandsToBezierPaths(commands) {
 			currentY = params[5];
 		}
 		if (command.type === 'Z') {
+			currentPath.push([
+				{ x: currentX, y: currentY },
+				false,
+				false,
+				{ x: currentPath[0][0].x, y: currentPath[0][0].y },
+			]);
+			currentX = currentPath[0][0].x;
+			currentY = currentPath[0][0].y;
 			bezierPaths.push(currentPath);
 			currentPath = [];
 		}
@@ -171,6 +179,7 @@ function convertToAbsolute(commands) {
 	let newCommand = {};
 	let currentPoint = { x: 0, y: 0 };
 	let newPoint = { x: 0, y: 0 };
+	let firstPoint = false;
 
 	commands.forEach((command) => {
 		if (command.type === 'm' || command.type === 'l') {
@@ -187,6 +196,7 @@ function convertToAbsolute(commands) {
 				newCommand.parameters.push(newPoint.y);
 				currentPoint.x = newPoint.x;
 				currentPoint.y = newPoint.y;
+				if (firstPoint === false) firstPoint = { x: newPoint.x, y: newPoint.y };
 			}
 
 			result.push(newCommand);
@@ -201,6 +211,7 @@ function convertToAbsolute(commands) {
 				newPoint.x = command.parameters[i] + currentPoint.x;
 				newCommand.parameters.push(newPoint.x);
 				currentPoint.x = newPoint.x;
+				if (firstPoint === false) firstPoint = { x: newPoint.x, y: newPoint.y };
 			}
 
 			result.push(newCommand);
@@ -215,6 +226,7 @@ function convertToAbsolute(commands) {
 				newPoint.y = command.parameters[i] + currentPoint.y;
 				newCommand.parameters.push(newPoint.y);
 				currentPoint.y = newPoint.y;
+				if (firstPoint === false) firstPoint = { x: newPoint.x, y: newPoint.y };
 			}
 
 			result.push(newCommand);
@@ -236,6 +248,7 @@ function convertToAbsolute(commands) {
 				newCommand.parameters.push(newPoint.y);
 				currentPoint.x = newPoint.x;
 				currentPoint.y = newPoint.y;
+				if (firstPoint === false) firstPoint = { x: newPoint.x, y: newPoint.y };
 			}
 
 			result.push(newCommand);
@@ -255,6 +268,7 @@ function convertToAbsolute(commands) {
 				newCommand.parameters.push(newPoint.y);
 				currentPoint.x = newPoint.x;
 				currentPoint.y = newPoint.y;
+				if (firstPoint === false) firstPoint = { x: newPoint.x, y: newPoint.y };
 			}
 
 			result.push(newCommand);
@@ -274,6 +288,7 @@ function convertToAbsolute(commands) {
 				newCommand.parameters.push(newPoint.y);
 				currentPoint.x = newPoint.x;
 				currentPoint.y = newPoint.y;
+				if (firstPoint === false) firstPoint = { x: newPoint.x, y: newPoint.y };
 			}
 
 			result.push(newCommand);
@@ -291,6 +306,7 @@ function convertToAbsolute(commands) {
 				newCommand.parameters.push(newPoint.y);
 				currentPoint.x = newPoint.x;
 				currentPoint.y = newPoint.y;
+				if (firstPoint === false) firstPoint = { x: newPoint.x, y: newPoint.y };
 			}
 
 			result.push(newCommand);
@@ -313,15 +329,19 @@ function convertToAbsolute(commands) {
 				newCommand.parameters.push(newPoint.y);
 				currentPoint.x = newPoint.x;
 				currentPoint.y = newPoint.y;
+				if (firstPoint === false) firstPoint = { x: newPoint.x, y: newPoint.y };
 			}
 
 			result.push(newCommand);
-		} else if (command.type === 'z') {
+		} else if (command.type.toLowerCase() === 'z') {
 			// End path
+			currentPoint = { x: firstPoint.x, y: firstPoint.y };
+			firstPoint = false;
 			result.push({ type: 'Z' });
 		} else {
 			// command is absolute, push it
 			result.push(command);
+			if (firstPoint === false) firstPoint = { x: currentPoint.x, y: currentPoint.y };
 			currentPoint = getNewEndPoint(currentPoint, command);
 		}
 	});
