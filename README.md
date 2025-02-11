@@ -6,7 +6,7 @@ Convert SVG shape tags to their cubic Bézier equivalent.
 
 This is meant to be a fairly complete way to dump an entire
 SVG document in, and get a set of Bezier curves out. SVG has _a lot_ of features,
-including things like colors, transforms, masks... many of these things do not really
+including things like colors, line weights, masks... many of these things do not really
 make sense if we're just wanting to extract Bezier curves out of some vector information.
 
 ## What's supported
@@ -114,9 +114,26 @@ So, overall, a collection of 2 paths, each with 2 Bezier curves, may look like t
 ]
 ```
 
+# Dev notes
+Working files are kept in the `/src` folder, and a snapshot of the latest stable release is kept in the `/dist` folder.
+
+Another large part of this library is the test suite. If you run a simple web server (something like `npx run http-server`) from the root directory, there are two test files available:
+* `_test_file.html` allows you to drag+drop a .svg file, run the conversion, and the results are shown both as code and visually on a Canvas.
+* `_test_suite.html` runs a huge collection of sample .svg files through the conversion. The output shows:
+  * The original svg visually
+  * The original svg as code
+  * The converted Bezier Format drawn to a canvas
+  * The converted Bezier Format as JSON code
+
+For each of these test tools, they try to make it easy to "visually confirm" or "visually debug" the conversion process. Because SVG is an inherently visual format, there is no way to programmatically run tests on the conversion output. Somebody has to just see the results and confirm it's as expected.
+
+The set of test .svg files is (hopefully) a complete set of everything SVG can draw... whenever we add features or fix a bug, we also add a test file. But, since SVG is large and complex, there is a chance we missed some strange edge case.
+
+Email matt@mattlag.com or mail@glyphrstudio.com if you encounter any strangeness.
+
 # License & Copyright
 
-Copyright © 2024 Matthew LaGrandeur
+Copyright © 2025 Matthew LaGrandeur
 
 Released under [GPL 3.0](https://www.gnu.org/licenses/gpl-3.0-standalone.html)
 
