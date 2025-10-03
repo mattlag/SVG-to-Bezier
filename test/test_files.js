@@ -48,6 +48,7 @@ export const testFiles = [
 	{ category: 'Complex Paths', name: 'multi_shape_4' },
 	{ category: 'Complex Paths', name: 'multi_shape_5' },
 	{ category: 'Complex Paths', name: 'multi_shape_6' },
+	{ category: 'Complex Paths', name: 'multi_shape_7' },
 	{ category: 'Inkscape Examples', name: 'inkscape_at' },
 	{ category: 'Inkscape Examples', name: 'inkscape_D' },
 	{ category: 'Inkscape Examples', name: 'inkscape_F' },

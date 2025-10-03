@@ -130,25 +130,25 @@ function convertCommandsToBezierPaths(commands) {
  */
 
 function chunkCommands(dAttribute) {
-	// log(`Start chunkCommands`);
+	log(`Start chunkCommands`);
 	let result = [];
 	let commandStart = false;
 
 	let data = sanitizeParameterData(dAttribute);
-	// log(data);
+	log(data);
 
 	// Find the first valid command
 	for (let j = 0; j < data.length; j++) {
 		if (isCommand(data.charAt(j))) {
 			commandStart = j;
-			// log(`First valid command ${data.charAt(j)} found at ${j}`);
+			log(`First valid command ${data.charAt(j)} found at ${j}`);
 			break;
 		}
 	}
 
 	if (commandStart === false) {
 		// No valid commands found
-		// log(`No valid commands found, returning Z`);
+		log(`No valid commands found, returning Z`);
 		return [{ type: 'Z' }];
 	}
 
@@ -165,13 +165,15 @@ function chunkCommands(dAttribute) {
 	}
 
 	// Fencepost
-	if (commandStart < data.length - 1) {
+	if (commandStart < data.length) {
 		result.push({
 			type: data.charAt(commandStart),
 			parameters: chunkAndValidateParameters(data.substring(commandStart + 1, data.length)),
 		});
 	}
 
+	log(JSON.stringify(result, null, 2));
+	log(`End chunkCommands`);
 	return result;
 }
 
