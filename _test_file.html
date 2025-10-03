@@ -20,6 +20,9 @@
 			document.getElementById('input-code').innerHTML = 'Drag + Drop a file here';
 		}
 
+		document.getElementById('input-code').addEventListener('paste', handleCodePaste);
+		document.getElementById('input-code').addEventListener('change', handleCodePaste);
+
 		function cancelDefaultEventActions(event) {
 			event.preventDefault();
 			event.stopPropagation();
@@ -64,6 +67,29 @@
 			document.getElementById(`output-code`).innerHTML = output;
 		}
 
+		function handleCodePaste(event) {
+			// let svgData = document.getElementById('input-code').innerHTML;
+			let svgData = event.target.value;
+			console.log(svgData);
+			let bezierPaths = SVGtoBezier(svgData);
+			console.log(bezierPaths);
+
+			document.getElementById('input-svg').innerHTML = svgData;
+
+			let clientRects = document.getElementById('input-svg').getClientRects()[0];
+			let canvas = document.getElementById('output-canvas');
+			canvas.width = clientRects.width;
+			canvas.height = clientRects.height;
+			canvas.style.width = `${clientRects.width}px`;
+			canvas.style.height = `${clientRects.height}px`;
+			
+			drawBeziersToCanvas(bezierPaths, canvas.getContext('2d'));
+			let output = JSON.stringify(bezierPaths);
+			output = output.replaceAll('],', '],\n');
+			output = output.replaceAll(']]]', ']\n]]');
+			output = output.replaceAll('[[', '[[\n');
+			document.getElementById(`output-code`).innerHTML = output;	
+		}
 
 	</script>
 	<style>
