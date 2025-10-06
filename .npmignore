@@ -1,0 +1,19 @@
+# Source files - only publish dist folder
+src/
+
+# Test files
+test/
+_test_file.html
+_test_suite.html
+
+# Development files
+.vscode/
+.prettierrc
+.gitattributes
+.gitignore
+
+# Node modules
+node_modules/
+
+# Git
+.git/

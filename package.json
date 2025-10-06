@@ -1,8 +1,46 @@
 {
-  "devDependencies": {
-    "http-server": "^14.1.1"
-  },
-  "scripts": {
-    "dev": "http-server -o ./"
-  }
+	"name": "svg-to-bezier",
+	"version": "2.2.0",
+	"description": "Convert SVG shape tags to their cubic Bézier equivalent",
+	"type": "module",
+	"main": "./dist/svg-to-bezier/svg-to-bezier.js",
+	"exports": {
+		".": "./dist/svg-to-bezier/svg-to-bezier.js",
+		"./transforms": "./dist/svg-to-bezier/transforms.js",
+		"./xml-to-json": "./dist/svg-to-bezier/xml-to-json.js"
+	},
+	"files": [
+		"dist/svg-to-bezier/**/*",
+		"README.md",
+		"LICENSE"
+	],
+	"scripts": {
+		"dev": "http-server -o ./"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/mattlag/SVG-to-Bezier.git"
+	},
+	"keywords": [
+		"svg",
+		"bezier",
+		"cubic-bezier",
+		"curves",
+		"vector",
+		"conversion",
+		"path",
+		"graphics"
+	],
+	"author": "Matthew LaGrandeur <matt@mattlag.com> (http://mattlag.com/)",
+	"license": "GPL-3.0",
+	"bugs": {
+		"url": "https://github.com/mattlag/SVG-to-Bezier/issues"
+	},
+	"homepage": "https://github.com/mattlag/SVG-to-Bezier#readme",
+	"devDependencies": {
+		"http-server": "^14.1.1"
+	},
+	"engines": {
+		"node": ">=14.0.0"
+	}
 }
