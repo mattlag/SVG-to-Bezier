@@ -2,7 +2,7 @@
 	SVG to Bezier
 	For more details, see: https://github.com/mattlag/SVG-to-Bezier
 	Also, more info on our 'Bezier Data Format' in bezier-data-format.md in this folder
-	Version: 2.1.2
+	Version: 2.2.0
 */
 
 import { tagConvertCircleEllipse } from './tag-convert-circle-ellipse.js';
@@ -15,7 +15,7 @@ import { XMLtoJSON } from './xml-to-json.js';
 /**
  * Global settings
  */
-export const enableConsoleLogging = true;
+export const enableConsoleLogging = false;
 export const roundToDecimalPrecision = false;
 
 /**
@@ -25,14 +25,14 @@ export const roundToDecimalPrecision = false;
  * @returns {Array} - collection of Paths in Bezier Data Format
  */
 export function SVGtoBezier(inputSVG) {
-	log(`\n\n========================\n========================\nSVGtoBezier`);
-	log(inputSVG);
+	// log(`\n\n========================\n========================\nSVGtoBezier`);
+	// log(inputSVG);
 	let svgDocumentData = XMLtoJSON(inputSVG);
-	log(`JSON DATA`);
-	log(svgDocumentData);
+	// log(`JSON DATA`);
+	// log(svgDocumentData);
 	let bezierPaths = convertTags(svgDocumentData, svgDocumentData);
-	log(bezierPaths);
-	log(`SVGtoBezier\n========================\n========================\n\n`);
+	// log(bezierPaths);
+	// log(`SVGtoBezier\n========================\n========================\n\n`);
 	return bezierPaths;
 }
 
@@ -43,17 +43,17 @@ export function SVGtoBezier(inputSVG) {
  * @returns {Array} - collection of Paths in Bezier Data Format
  */
 function convertTags(tagData, svgDocumentData) {
-	log(`\n\nCONVERT TAGS - START ${tagData.name}`);
-	log('tagData');
-	log(tagData);
+	// log(`\n\nCONVERT TAGS - START ${tagData.name}`);
+	// log('tagData');
+	// log(tagData);
 	if (!tagData?.content) return [];
 
 	let resultBezierPaths = [];
 
 	tagData.content.forEach((tag) => {
-		log(`\n\n\n<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n START TAG ${tag.name}`);
-		log('tag');
-		log(tag);
+		// log(`\n\n\n<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n START TAG ${tag.name}`);
+		// log('tag');
+		// log(tag);
 
 		let name = tag.name.toLowerCase();
 
@@ -72,30 +72,30 @@ function convertTags(tagData, svgDocumentData) {
 
 		// Collect transforms
 		const tagTransforms = getTransformData(tag);
-		log(`tagTransforms`);
-		log(tagTransforms);
+		// log(`tagTransforms`);
+		// log(tagTransforms);
 
 		// Convert supported tags
 		if (convert[name]) {
-			log(`\n\n======= converting ${tag.name} =======`);
+			// log(`\n\n======= converting ${tag.name} =======`);
 			let bezierPaths;
 			if (name === 'g') bezierPaths = convertTags(tag, svgDocumentData);
 			else bezierPaths = convert[name](tag);
-			log(`converted tag: \n${JSON.stringify(bezierPaths)}`);
+			// log(`converted tag: \n${JSON.stringify(bezierPaths)}`);
 			if (tagTransforms) {
-				log(`\n\n======= transforming ${tag.name} =======`);
+				// log(`\n\n======= transforming ${tag.name} =======`);
 				bezierPaths = applyTransformData(bezierPaths, tagTransforms);
 			}
-			log(`transformed tag: \n${JSON.stringify(bezierPaths)}`);
+			// log(`transformed tag: \n${JSON.stringify(bezierPaths)}`);
 			resultBezierPaths = resultBezierPaths.concat(bezierPaths);
 		}
 
-		log(`>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n END TAG ${tag.name}\n\n\n\n`);
+		// log(`>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n END TAG ${tag.name}\n\n\n\n`);
 	});
 
-	log(`resultBezierPaths`);
-	log(resultBezierPaths);
-	log(`CONVERT TAGS - END ${tagData.name}\n\n`);
+	// log(`resultBezierPaths`);
+	// log(resultBezierPaths);
+	// log(`CONVERT TAGS - END ${tagData.name}\n\n`);
 	return resultBezierPaths;
 }
 
@@ -196,9 +196,9 @@ export function chunkAndValidateParameters(data = '') {
  * @param {Object} rootNode - full SVG document data for xlink lookups
  */
 export function getCopyOfTagByID(id, rootNode) {
-	log(`getCopyOfTagByID`);
-	log(`id: ${id}`);
-	log(rootNode);
+	// log(`getCopyOfTagByID`);
+	// log(`id: ${id}`);
+	// log(rootNode);
 
 	let result = [];
 
@@ -215,7 +215,7 @@ export function getCopyOfTagByID(id, rootNode) {
 		}
 	}
 
-	log(result);
+	// log(result);
 	return result;
 }
 

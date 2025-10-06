@@ -8,8 +8,8 @@ import { log, roundAndSanitize } from './svg-to-bezier.js';
  * @returns {Array} - Collection of objects containing individual transform names & arguments
  */
 export function getTransformData(tag) {
-	log(`getTransformData`);
-	log(tag);
+	// log(`getTransformData`);
+	// log(tag);
 	if (!tag || !tag?.attributes) return [];
 
 	/* 
@@ -54,7 +54,7 @@ export function getTransformData(tag) {
 		(x, y, z) // default to 0,0 - ignore z value
 	*/
 	if (tag.attributes['transform-origin']) {
-		log(`Detected transform origin`);
+		// log(`Detected transform origin`);
 		temp = tag.attributes['transform-origin'];
 		temp = temp.replaceAll(',', ' ');
 		temp = temp.replaceAll('  ', ' ');
@@ -67,7 +67,7 @@ export function getTransformData(tag) {
 	}
 
 	// Finish up
-	log(transforms);
+	// log(transforms);
 	return transforms;
 }
 
@@ -78,17 +78,17 @@ export function getTransformData(tag) {
  * @returns {Array} - bezierPaths array
  */
 export function applyTransformData(bezierPaths = [], transformData = []) {
-	log(`\napplyTransformData`);
-	log(`\t P A S S E D\n`);
-	log('bezierPaths');
-	log(JSON.stringify(bezierPaths));
-	log('transformData');
-	log(transformData);
+	// log(`\napplyTransformData`);
+	// log(`\t P A S S E D\n`);
+	// log('bezierPaths');
+	// log(JSON.stringify(bezierPaths));
+	// log('transformData');
+	// log(transformData);
 
-	log(`\t V A L I D A T E D\n`);
+	// log(`\t V A L I D A T E D\n`);
 	const resultBezierPaths = structuredClone(bezierPaths);
-	log(`\t RESULT BEZIER PATHS (start)\n`);
-	log(JSON.stringify(resultBezierPaths));
+	// log(`\t RESULT BEZIER PATHS (start)\n`);
+	// log(JSON.stringify(resultBezierPaths));
 
 	// Transforms get applied from right to left in the
 	// order they were included from the attribute
@@ -101,18 +101,18 @@ export function applyTransformData(bezierPaths = [], transformData = []) {
 			break;
 		}
 	}
-	log(`\t ORDERED TRANSFORMS\n`);
-	log(JSON.stringify(orderedTransforms));
-	log(`originData: ${originData.toString()}`);
+	// log(`\t ORDERED TRANSFORMS\n`);
+	// log(JSON.stringify(orderedTransforms));
+	// log(`originData: ${originData.toString()}`);
 
 	// Start transforming
 	orderedTransforms.forEach((oneTransform) => {
 		if (transformCurve[oneTransform.name]) {
-			log(`\n\t${oneTransform.name}`);
+			// log(`\n\t${oneTransform.name}`);
 			const transformFn = transformCurve[oneTransform.name];
 			resultBezierPaths.forEach((singlePath, pathIndex) => {
 				singlePath.forEach((singleCurve, curveIndex) => {
-					log(`\n~~~ TRANSFORM CURVE ${curveIndex}`);
+					// log(`\n~~~ TRANSFORM CURVE ${curveIndex}`);
 					// log(`\t\tbefore transform:`);
 					// logCurve(singleCurve);
 
@@ -126,8 +126,8 @@ export function applyTransformData(bezierPaths = [], transformData = []) {
 		}
 	});
 
-	log(`\n\t AFTER TRANSFORM PATHS\n`);
-	log(JSON.stringify(resultBezierPaths));
+	// log(`\n\t AFTER TRANSFORM PATHS\n`);
+	// log(JSON.stringify(resultBezierPaths));
 	return resultBezierPaths;
 }
 
@@ -146,18 +146,35 @@ const transformCurve = {
 };
 
 function matrixTransformCurve(curve = [], args = [], origin = []) {
-	log(`:: TRANSFORM CURVE :: matrix`);
+	// log(`:: TRANSFORM CURVE :: matrix`);
 	const resultCurve = [];
-	while (args.length < 6) args.push(0);
-	log(`\t\tmatrix: ${args.toString()}`);
+
+	// Fill in default values for identity matrix: [1, 0, 0, 1, 0, 0]
+	const defaults = [1, 0, 0, 1, 0, 0];
+	while (args.length < 6) {
+		args.push(defaults[args.length]);
+	}
+
+	let originX = origin[0] || 0;
+	let originY = origin[1] || 0;
+	// log(`origin: ${origin.toString()}`);
+	// log(`\t\tmatrix: ${args.toString()}`);
 
 	function calculateNewPoint(oldPoint) {
 		if (oldPoint === false) return false;
-		const oldX = oldPoint.x;
-		const oldY = oldPoint.y;
 		const newPoint = { x: 0, y: 0 };
-		newPoint.x = roundAndSanitize(1 * args[0] * oldX + 1 * args[2] * oldY + 1 * args[4]);
-		newPoint.y = roundAndSanitize(1 * args[1] * oldX + 1 * args[3] * oldY + 1 * args[5]);
+
+		// Translate to origin
+		const translatedX = oldPoint.x - originX;
+		const translatedY = oldPoint.y - originY;
+
+		// Apply matrix transformation: new_x = a * x + c * y + e, new_y = b * x + d * y + f
+		const transformedX = args[0] * translatedX + args[2] * translatedY + args[4];
+		const transformedY = args[1] * translatedX + args[3] * translatedY + args[5];
+
+		// Translate back
+		newPoint.x = roundAndSanitize(transformedX + originX);
+		newPoint.y = roundAndSanitize(transformedY + originY);
 
 		return newPoint;
 	}
@@ -170,13 +187,14 @@ function matrixTransformCurve(curve = [], args = [], origin = []) {
 	return resultCurve;
 }
 
-function translateTransformCurve(curve = [], args = [], origin = []) {
-	log(`:: TRANSFORM CURVE :: translate`);
+function translateTransformCurve(curve = [], args = []) {
+	// translate transform does not use transform-origin
+	// log(`:: TRANSFORM CURVE :: translate`);
 	const resultCurve = [];
-	const dx = args[0] || 0;
-	const dy = args[1] || 0;
-	log(`\t\ttranslate: ${dx}, ${dy}`);
-	log(`\t\tcurve[0]: ${curve[0].x}, ${curve[0].y}`);
+	let dx = args[0] || 0;
+	let dy = args[1] || 0;
+	// log(`\t\ttranslate: ${dx}, ${dy}`);
+	// log(`\t\tcurve[0]: ${curve[0].x}, ${curve[0].y}`);
 
 	function calculateNewPoint(oldPoint) {
 		if (oldPoint === false) return false;
@@ -196,19 +214,23 @@ function translateTransformCurve(curve = [], args = [], origin = []) {
 }
 
 function scaleTransformCurve(curve = [], args = [], origin = []) {
-	log(`:: TRANSFORM CURVE :: scale`);
+	// log(`:: TRANSFORM CURVE :: scale`);
 	const scaleX = args[0];
 	let scaleY = args[1];
 	if (!scaleY) scaleY = scaleX;
 	const resultCurve = [];
-	log(`\t\tscale args: ${args.toString()}`);
-	log(`\t\tscale validated: ${scaleX}, ${scaleY}`);
+
+	let originX = origin[0] || 0;
+	let originY = origin[1] || 0;
+	// log(`origin: ${origin.toString()}`);
+	// log(`\t\tscale args: ${args.toString()}`);
+	// log(`\t\tscale validated: ${scaleX}, ${scaleY}`);
 
 	function calculateNewPoint(oldPoint) {
 		if (oldPoint === false) return false;
 		const newPoint = { x: 0, y: 0 };
-		newPoint.x = roundAndSanitize(oldPoint.x * scaleX);
-		newPoint.y = roundAndSanitize(oldPoint.y * scaleY);
+		newPoint.x = roundAndSanitize((oldPoint.x - originX) * scaleX + originX);
+		newPoint.y = roundAndSanitize((oldPoint.y - originY) * scaleY + originY);
 
 		return newPoint;
 	}
@@ -222,8 +244,8 @@ function scaleTransformCurve(curve = [], args = [], origin = []) {
 }
 
 function rotateTransformCurve(curve = [], args = [], origin = []) {
-	log(`:: TRANSFORM CURVE :: rotate`);
-	log(`origin: ${origin.toString()}`);
+	// log(`:: TRANSFORM CURVE :: rotate`);
+	// log(`origin: ${origin.toString()}`);
 	const angle = angleToRadians(args[0]);
 	const about = { x: 0, y: 0 };
 	if (!args[1]) args[1] = 0;
@@ -233,9 +255,9 @@ function rotateTransformCurve(curve = [], args = [], origin = []) {
 	about.y = args[2] + origin[1];
 
 	const resultCurve = [];
-	log(`\t\trotate args: ${args.toString()}`);
-	log(`\t\trotate validated: ${angle}`);
-	log(`\t\trotate about: ${about.x}, ${about.y}`);
+	// log(`\t\trotate args: ${args.toString()}`);
+	// log(`\t\trotate validated: ${angle}`);
+	// log(`\t\trotate about: ${about.x}, ${about.y}`);
 
 	function calculateNewPoint(point) {
 		if (!point) return false;
@@ -262,11 +284,15 @@ function rotateTransformCurve(curve = [], args = [], origin = []) {
 }
 
 function skewxTransformCurve(curve = [], args = [], origin = []) {
-	log(`:: TRANSFORM CURVE :: skewx`);
+	// log(`:: TRANSFORM CURVE :: skewx`);
 	const resultCurve = [];
-	log(`\t\tskewx: ${args.toString()}`);
+	// log(`\t\tskewx: ${args.toString()}`);
 	const radians = angleToRadians(args[0]);
 	const yMultiplier = Math.tan(radians);
+
+	let originX = origin[0] || 0;
+	let originY = origin[1] || 0;
+	// log(`origin: ${origin.toString()}`);
 
 	function calculateNewPoint(oldPoint) {
 		if (!oldPoint) return false;
@@ -274,7 +300,9 @@ function skewxTransformCurve(curve = [], args = [], origin = []) {
 		const oldY = oldPoint.y;
 		const newPoint = { x: 0, y: 0 };
 
-		newPoint.x = roundAndSanitize(oldX + yMultiplier * oldY);
+		newPoint.x = roundAndSanitize(
+			oldPoint.x - originX + yMultiplier * (oldPoint.y - originY) + originX
+		);
 		newPoint.y = roundAndSanitize(oldY);
 
 		return newPoint;
@@ -289,20 +317,24 @@ function skewxTransformCurve(curve = [], args = [], origin = []) {
 }
 
 function skewyTransformCurve(curve = [], args = [], origin = []) {
-	log(`:: TRANSFORM CURVE :: skewy`);
+	// log(`:: TRANSFORM CURVE :: skewy`);
 	const resultCurve = [];
-	log(`\t\tskewy: ${args.toString()}`);
+	// log(`\t\tskewy: ${args.toString()}`);
 	const radians = angleToRadians(args[0]);
 	const xMultiplier = Math.tan(radians);
 
+	let originX = origin[0] || 0;
+	let originY = origin[1] || 0;
+	// log(`origin: ${origin.toString()}`);
+
 	function calculateNewPoint(oldPoint) {
 		if (!oldPoint) return false;
-		const oldX = oldPoint.x;
-		const oldY = oldPoint.y;
 		const newPoint = { x: 0, y: 0 };
 
-		newPoint.x = roundAndSanitize(oldX);
-		newPoint.y = roundAndSanitize(oldY + xMultiplier * oldX);
+		newPoint.x = roundAndSanitize(oldPoint.x);
+		newPoint.y = roundAndSanitize(
+			oldPoint.y - originY + xMultiplier * (oldPoint.x - originX) + originY
+		);
 
 		return newPoint;
 	}

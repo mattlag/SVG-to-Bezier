@@ -1,6 +1,6 @@
 import {
 	chunkAndValidateParameters,
-	log,
+	// log,
 	roundAndSanitize,
 	sanitizeParameterData,
 } from './svg-to-bezier.js';
@@ -12,9 +12,9 @@ import { convertArcToCommandToBezier } from './tag-convert-path-arc.js';
  * @returns {Array} - resulting path(s) in Bezier Data Format
  */
 export function tagConvertPath(tagData = {}) {
-	log(`\ntagConvertPath`);
+	// log(`\ntagConvertPath`);
 	const dAttribute = tagData.attributes.d || '';
-	log(`\t dAttribute: ${dAttribute}`);
+	// log(`\t dAttribute: ${dAttribute}`);
 
 	// Check for commands
 	if (dAttribute.length === 0 || dAttribute.length === 1) {
@@ -24,41 +24,41 @@ export function tagConvertPath(tagData = {}) {
 	// Take the command string and split into an array containing
 	// command objects, comprised of the command letter and parameters
 	let commands = chunkCommands(dAttribute);
-	log('After chunkCommands');
-	log(commands);
+	// log('After chunkCommands');
+	// log(commands);
 
 	// Convert relative commands: m, l, h, v, c, s, q, t, a, z
 	// to absolute commands: M, L, H, V, C, S, Q, T, A, Z
 	// Converting to Absolute should be done before convertLineTo and convertSmoothBeziers
 	// because they are unable to handle relative commands.
 	commands = convertToAbsolute(commands);
-	log('After convertToAbsolute');
-	log(commands);
+	// log('After convertToAbsolute');
+	// log(commands);
 
 	// Convert chains of parameters to individual command / parameter pairs
 	commands = splitChainParameters(commands);
-	log('After splitChainParameters');
-	log(commands);
+	// log('After splitChainParameters');
+	// log(commands);
 
 	// Convert Horizontal and Vertical LineTo commands to regular LineTo commands
 	commands = convertLineTo(commands);
-	log('After convertLineTo');
-	log(commands); // Convert Smooth Cubic Bézier commands S to regular Cubic Bézier commands C
+	// log('After convertLineTo');
+	// log(commands); // Convert Smooth Cubic Bézier commands S to regular Cubic Bézier commands C
 
 	// Convert Smooth Quadratic Bézier commands T to regular Quadratic Bézier commands Q
 	commands = convertSmoothBeziers(commands);
-	log('After convertSmoothBeziers');
-	log(commands);
+	// log('After convertSmoothBeziers');
+	// log(commands);
 
 	// Convert Quadratic Bézier Q commands to Cubic Bézier commands C
 	commands = convertQuadraticBeziers(commands);
-	log('After convertQuadraticBeziers');
-	log(commands);
+	// log('After convertQuadraticBeziers');
+	// log(commands);
 
 	// Convert Elliptical Arc commands A to Cubic Bézier commands C
 	commands = convertArcs(commands);
-	log('After convertArcs');
-	log(commands);
+	// log('After convertArcs');
+	// log(commands);
 
 	// Do the final conversion to Bezier Data format
 	const bezierPaths = convertCommandsToBezierPaths(commands);
@@ -130,25 +130,25 @@ function convertCommandsToBezierPaths(commands) {
  */
 
 function chunkCommands(dAttribute) {
-	log(`Start chunkCommands`);
+	// log(`Start chunkCommands`);
 	let result = [];
 	let commandStart = false;
 
 	let data = sanitizeParameterData(dAttribute);
-	log(data);
+	// log(data);
 
 	// Find the first valid command
 	for (let j = 0; j < data.length; j++) {
 		if (isCommand(data.charAt(j))) {
 			commandStart = j;
-			log(`First valid command ${data.charAt(j)} found at ${j}`);
+			// log(`First valid command ${data.charAt(j)} found at ${j}`);
 			break;
 		}
 	}
 
 	if (commandStart === false) {
 		// No valid commands found
-		log(`No valid commands found, returning Z`);
+		// log(`No valid commands found, returning Z`);
 		return [{ type: 'Z' }];
 	}
 
@@ -172,8 +172,8 @@ function chunkCommands(dAttribute) {
 		});
 	}
 
-	log(JSON.stringify(result, null, 2));
-	log(`End chunkCommands`);
+	// log(JSON.stringify(result, null, 2));
+	// log(`End chunkCommands`);
 	return result;
 }
 
@@ -186,10 +186,10 @@ function convertToAbsolute(commands) {
 	firstPoint = {};
 
 	commands.forEach((command) => {
-		log(`Command: ${command.type}`);
+		// log(`Command: ${command.type}`);
 		if (command.type === 'm' || command.type === 'l') {
 			// MoveTo and LineTo
-			log(`currentPoint: ${currentPoint.x}, ${currentPoint.y}`);
+			// log(`currentPoint: ${currentPoint.x}, ${currentPoint.y}`);
 
 			newCommand = {
 				type: command.type === 'm' ? 'M' : 'L',
@@ -346,9 +346,9 @@ function convertToAbsolute(commands) {
 		} else if (command.type === 'z' || command.type === 'Z') {
 			// End path
 			currentPoint = { x: firstPoint.x, y: firstPoint.y };
-			log(`END OF PATH Z: Setting current point to first point`);
-			log(`firstPoint: ${firstPoint.x}, ${firstPoint.y}`);
-			log(`currentPoint: ${currentPoint.x}, ${currentPoint.y}`);
+			// log(`END OF PATH Z: Setting current point to first point`);
+			// log(`firstPoint: ${firstPoint.x}, ${firstPoint.y}`);
+			// log(`currentPoint: ${currentPoint.x}, ${currentPoint.y}`);
 			firstPoint = false;
 			result.push({ type: 'Z' });
 		} else {
@@ -675,7 +675,7 @@ function convertArcs(commands) {
 let firstPoint = {};
 function setFirstPoint(point) {
 	if (!firstPoint.hasOwnProperty('x') && !firstPoint.hasOwnProperty('y')) {
-		log(`Setting First Point! ${point.x}, ${point.y}`);
+		// log(`Setting First Point! ${point.x}, ${point.y}`);
 		firstPoint = {
 			x: point.x,
 			y: point.y,
