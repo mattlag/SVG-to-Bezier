@@ -11,5 +11,5 @@
 		h 60 40
 		v 100
 		H 100
-		Z"/>
+		Z" stroke="blue" fill="lightgray"/>
 </svg>
