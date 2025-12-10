@@ -26,12 +26,12 @@ import { SVGtoBezier } from 'svg-to-bezier';
 The following tags and attributes are supported. Default values are shown for attributes.
 
 - `<circle cx="0" cy="0" r="0">`
-- `<ellipse cx="0" cy="0" rx="100" ry="100">`
+- `<ellipse cx="0" cy="0" rx="0" ry="0">`
 - `<line x1="0" y1="0" x2="0" y2="0">`
 - `<path d="">`
 - `<polygon points="">`
 - `<polyline points="">`
-- `<rect x="0" y="0" width="100" height="100">`
+- `<rect x="0" y="0" rx="" ry="" width="0" height="0">`
 
 The `transform` and `transform-origin` attributes are also supported.
 
