@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg">
+  <rect x="10" y="10" rx="20" ry="20" width="80" height="80" stroke="blue" fill="lightgray"/>
+  <rect x="110" y="10" rx="0" ry="20" width="80" height="80" stroke="blue" fill="lightgray"/>
+  <rect x="210" y="10" rx="20" ry="0" width="80" height="80" stroke="blue" fill="lightgray"/>
+
+  <rect x="10" y="110" rx="20" ry="40" width="80" height="80" stroke="blue" fill="lightgray"/>
+  <rect x="110" y="110" rx="40" ry="20" width="80" height="80" stroke="blue" fill="lightgray"/>
+  <rect x="210" y="110" rx="40" ry="40" width="80" height="80" stroke="blue" fill="lightgray"/>
+
+  <!-- rx and ry default to eachother if the other is missing-->
+  <!-- This is different behavior than defaulting to zero -->
+  <rect x="10" y="210" rx="60" ry="60" width="80" height="80" stroke="blue" fill="lightgray"/>
+  <rect x="110" y="210" ry="20" width="80" height="80" stroke="blue" fill="lightgray"/>
+  <rect x="210" y="210" rx="20" width="80" height="80" stroke="blue" fill="lightgray"/>
+</svg>
