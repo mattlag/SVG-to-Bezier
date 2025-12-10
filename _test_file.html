@@ -1,148 +1,165 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<title>SVG to Bezier - File Tester</title>
-	<script type="module">
-		import { SVGtoBezier } from './src/svg-to-bezier.js';
-		import { drawBeziersToCanvas } from './test/canvas-drawing.js';
+	<head>
+		<meta charset="UTF-8" />
+		<title>SVG to Bezier - File Tester</title>
+		<script type="module">
+			import { SVGtoBezier } from './src/svg-to-bezier.js';
+			import { drawBeziersToCanvas } from './test/canvas-drawing.js';
 
-		document.body.addEventListener('dragenter', handleDragEnter);
-		document.body.addEventListener('dragover', cancelDefaultEventActions);
-		document.body.addEventListener('drop', handleDrop);
-		document.body.addEventListener('dragleave', handleDragLeave);
+			let currentBezierPaths = [];
 
-		function handleDragEnter() {
-			document.getElementById('input-code').innerHTML = 'Drop it!';
-		}
-		
-		function handleDragLeave() {
-			document.getElementById('input-code').innerHTML = 'Drag + Drop a file here';
-		}
+			// Add event listener for checkbox to trigger redraw
+			document.addEventListener('DOMContentLoaded', () => {
+				document.getElementById('show-path-points').addEventListener('change', () => {
+					redrawCanvas();
+				});
+			});
 
-		document.getElementById('input-code').addEventListener('paste', handleCodePaste);
-		document.getElementById('input-code').addEventListener('change', handleCodePaste);
+			document.body.addEventListener('dragenter', handleDragEnter);
+			document.body.addEventListener('dragover', cancelDefaultEventActions);
+			document.body.addEventListener('drop', handleDrop);
+			document.body.addEventListener('dragleave', handleDragLeave);
 
-		function cancelDefaultEventActions(event) {
-			event.preventDefault();
-			event.stopPropagation();
-			return false;
-		}
+			function handleDragEnter() {
+				document.getElementById('input-code').innerHTML = 'Drop it!';
+			}
 
-		function handleDrop(event){
-			console.log('Handle Drop');
-			cancelDefaultEventActions(event);
-			const filesData = event.dataTransfer;
-			console.log(filesData);
-			const file = filesData.files[0];
-			console.log(file);
-			const reader = new FileReader();
-			reader.onload = handleFileRead;
-			reader.readAsText(file);
-		}
+			function handleDragLeave() {
+				document.getElementById('input-code').innerHTML = 'Drag + Drop a file here';
+			}
 
-		function handleFileRead() {
-			console.log('File Reader Onload');
-			// console.log(this.result);
-			let svgData = this.result;
-			// console.log(svgData);
-			let bezierPaths = SVGtoBezier(svgData);
-			console.log(bezierPaths);
+			document.getElementById('input-code').addEventListener('paste', handleCodePaste);
+			document.getElementById('input-code').addEventListener('change', handleCodePaste);
 
-			document.getElementById('input-code').innerHTML = svgData;
-			document.getElementById('input-svg').innerHTML = svgData;
+			function cancelDefaultEventActions(event) {
+				event.preventDefault();
+				event.stopPropagation();
+				return false;
+			}
 
-			let clientRects = document.getElementById('input-svg').getClientRects()[0];
-			let canvas = document.getElementById('output-canvas');
-			canvas.width = clientRects.width;
-			canvas.height = clientRects.height;
-			canvas.style.width = `${clientRects.width}px`;
-			canvas.style.height = `${clientRects.height}px`;
-			
-			drawBeziersToCanvas(bezierPaths, canvas.getContext('2d'));
-			let output = JSON.stringify(bezierPaths);
-			output = output.replaceAll('],', '],\n');
-			output = output.replaceAll(']]]', ']\n]]');
-			output = output.replaceAll('[[', '[[\n');
-			document.getElementById(`output-code`).innerHTML = output;
-		}
+			function handleDrop(event) {
+				console.log('Handle Drop');
+				cancelDefaultEventActions(event);
+				const filesData = event.dataTransfer;
+				console.log(filesData);
+				const file = filesData.files[0];
+				console.log(file);
+				const reader = new FileReader();
+				reader.onload = handleFileRead;
+				reader.readAsText(file);
+			}
 
-		function handleCodePaste(event) {
-			// let svgData = document.getElementById('input-code').innerHTML;
-			let svgData = event.target.value;
-			console.log(svgData);
-			let bezierPaths = SVGtoBezier(svgData);
-			console.log(bezierPaths);
+			function handleFileRead() {
+				console.log('File Reader Onload');
+				// console.log(this.result);
+				let svgData = this.result;
+				// console.log(svgData);
+				currentBezierPaths = SVGtoBezier(svgData);
+				console.log(currentBezierPaths);
 
-			document.getElementById('input-svg').innerHTML = svgData;
+				document.getElementById('input-code').innerHTML = svgData;
+				document.getElementById('input-svg').innerHTML = svgData;
+				redrawCanvas(currentBezierPaths);
 
-			let clientRects = document.getElementById('input-svg').getClientRects()[0];
-			let canvas = document.getElementById('output-canvas');
-			canvas.width = clientRects.width;
-			canvas.height = clientRects.height;
-			canvas.style.width = `${clientRects.width}px`;
-			canvas.style.height = `${clientRects.height}px`;
-			
-			drawBeziersToCanvas(bezierPaths, canvas.getContext('2d'));
-			let output = JSON.stringify(bezierPaths);
-			output = output.replaceAll('],', '],\n');
-			output = output.replaceAll(']]]', ']\n]]');
-			output = output.replaceAll('[[', '[[\n');
-			document.getElementById(`output-code`).innerHTML = output;	
-		}
+				const showPoints = document.getElementById('show-path-points')?.checked ?? true;
+				drawBeziersToCanvas(currentBezierPaths, canvas.getContext('2d'), showPoints);
+				let output = JSON.stringify(currentBezierPaths);
+				output = output.replaceAll('],', '],\n');
+				output = output.replaceAll(']]]', ']\n]]');
+				output = output.replaceAll('[[', '[[\n');
+				document.getElementById(`output-code`).innerHTML = output;
+			}
 
-	</script>
-	<style>
-		* {
-			margin: 0;
-			padding: 0;
-			box-sizing: border-box;
-			font-weight: normal;
-			font-family: sans-serif;
-		}
+			function handleCodePaste(event) {
+				// let svgData = document.getElementById('input-code').innerHTML;
+				let svgData = event.target.value;
+				console.log(svgData);
+				currentBezierPaths = SVGtoBezier(svgData);
+				console.log(currentBezierPaths);
 
-		html, body {
-			height: 100%;
-		}
+				document.getElementById('input-svg').innerHTML = svgData;
 
-		body {
-			padding: 20px;
-			display: grid;
-			row-gap: 20px;
-			column-gap: 20px;
-			grid-template-columns: 1fr 1fr;
-			grid-template-rows: min-content min-content 1fr 1fr max-content;
-		}
+				redrawCanvas(currentBezierPaths);
+				let output = JSON.stringify(currentBezierPaths);
+				output = output.replaceAll('],', '],\n');
+				output = output.replaceAll(']]]', ']\n]]');
+				output = output.replaceAll('[[', '[[\n');
+				document.getElementById(`output-code`).innerHTML = output;
+			}
 
-		h1 {
-			grid-column: span 2;
-		}
+			function redrawCanvas() {
+				let clientRects = document.getElementById('input-svg').getClientRects()[0];
+				let canvas = document.getElementById('output-canvas');
+				canvas.width = clientRects.width;
+				canvas.height = clientRects.height;
+				canvas.style.width = `${clientRects.width}px`;
+				canvas.style.height = `${clientRects.height}px`;
 
-		textarea {
-			height: 300px;
-			font-family: 'Cascadia Code', Consolas, monospace;
-			font-size: 14px;
-		}
-		
-		#input-svg, #output-canvas, textarea {
-			width: 100%;
-			height: 100%;
-			border: 1px solid lightgray;
-		}
+				const showPoints = document.getElementById('show-path-points')?.checked ?? true;
+				drawBeziersToCanvas(currentBezierPaths, canvas.getContext('2d'), showPoints);
+			}
+		</script>
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+				font-weight: normal;
+				font-family: sans-serif;
+			}
 
-		#input-svg svg {
-			width: 100%;
-			height: 100%;
-		}
-	</style>
-</head>
-<body>
-	<h1>SVG to Bezier - file tester</h1>
-	<h3>input</h3>
-	<h3>output</h3>
-	<textarea id="input-code">Drag + Drop a file here</textarea>
-	<textarea id="output-code"></textarea>
-	<div id="input-svg"></div>
-	<canvas id="output-canvas"></canvas>
-</body>
+			html,
+			body {
+				height: 100%;
+			}
+
+			body {
+				padding: 20px;
+				display: grid;
+				row-gap: 20px;
+				column-gap: 20px;
+				grid-template-columns: 1fr 1fr;
+				grid-template-rows: min-content min-content min-content 1fr 1fr max-content;
+			}
+
+			h1,
+			label {
+				grid-column: span 2;
+			}
+
+			h3 {
+				max-height: 40px;
+			}
+
+			textarea {
+				height: 300px;
+				font-family: 'Cascadia Code', Consolas, monospace;
+				font-size: 14px;
+			}
+
+			#input-svg,
+			#output-canvas,
+			textarea {
+				width: 100%;
+				height: 100%;
+				border: 1px solid lightgray;
+			}
+
+			#input-svg svg {
+				width: 100%;
+				height: 100%;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>SVG to Bezier - file tester</h1>
+		<label><input type="checkbox" id="show-path-points" checked /> Show path points</label>
+		<h3>input</h3>
+		<h3>output</h3>
+		<textarea id="input-code">Drag + Drop a file here</textarea>
+		<textarea id="output-code"></textarea>
+		<div id="input-svg"></div>
+		<canvas id="output-canvas"></canvas>
+	</body>
 </html>

@@ -356,7 +356,6 @@ function angleToRadians(angle) {
 }
 
 function logCurve(curve) {
-	// console.log(JSON.stringify(curve));
 	console.table({
 		x: [curve[0].x, curve[1]?.x, curve[2]?.x, curve[3].x],
 		y: [curve[0].y, curve[1]?.y, curve[2]?.y, curve[3].y],

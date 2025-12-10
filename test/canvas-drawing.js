@@ -1,7 +1,8 @@
-export function drawBeziersToCanvas(bezierPaths, ctx) {
+export function drawBeziersToCanvas(bezierPaths, ctx, drawPoints = true) {
 	// console.log(`drawBeziersToCanvas`);
 	// console.log(bezierPaths);
 	ctx.lineWidth = 2;
+	ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 	bezierPaths.forEach((path) => {
 		const pathAccentColor = `hsl(${Math.floor(Math.random() * 360)}, 80%, 40%)`;
 		ctx.font = '8px Verdana';
@@ -27,10 +28,12 @@ export function drawBeziersToCanvas(bezierPaths, ctx) {
 				ctx.bezierCurveTo(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
 				// console.log(`  curve: ${p1.x}, ${p1.y}  ${p2.x}, ${p2.y}  ${p3.x}, ${p3.y}`);
 			}
-			drawPoint(p0, ctx, pathAccentColor);
-			if (curve[1] !== false) drawHandle(p1, ctx, pathAccentColor);
-			if (curve[2] !== false) drawHandle(p2, ctx, pathAccentColor);
-			drawPoint(p3, ctx, pathAccentColor);
+			if (drawPoints) {
+				drawPoint(p0, ctx, pathAccentColor);
+				if (curve[1] !== false) drawHandle(p1, ctx, pathAccentColor);
+				if (curve[2] !== false) drawHandle(p2, ctx, pathAccentColor);
+				drawPoint(p3, ctx, pathAccentColor);
+			}
 			lastPoint = p3;
 		});
 		ctx.strokeStyle = pathAccentColor;

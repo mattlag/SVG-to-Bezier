@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
@@ -9,6 +9,13 @@
 			import { testFiles, enabledTestCategories } from './test/test_files.js';
 
 			let fileContent = {};
+
+			// Add event listener for checkbox to trigger redraw
+			window.addEventListener('load', () => {
+				document.getElementById('show-path-points')?.addEventListener('change', () => {
+					redrawAllCanvases();
+				});
+			});
 
 			document.addEventListener('DOMContentLoaded', () => {
 				let target = document.getElementById('target');
@@ -59,9 +66,11 @@
 
 									console.log(`DRAWING ${bezierPaths.length} PATHS for ${fileName}`);
 									console.log(bezierPaths);
+									const showPoints = document.getElementById('show-path-points')?.checked ?? true;
 									drawBeziersToCanvas(
 										bezierPaths,
-										document.getElementById(`post-img-${fileName}`).getContext('2d')
+										document.getElementById(`post-img-${fileName}`).getContext('2d'),
+										showPoints,
 									);
 								} else {
 									let message = 'Only works on a server, something like `npx http-server`';
@@ -70,11 +79,24 @@
 								}
 								console.log(`${fileName}\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n\n`);
 							},
-							false
+							false,
 						);
 					}
 				});
 			});
+
+			function redrawAllCanvases() {
+				Object.keys(fileContent).forEach((fileName) => {
+					let svgData = fileContent[fileName];
+					let bezierPaths = SVGtoBezier(svgData);
+					const showPoints = document.getElementById('show-path-points')?.checked ?? true;
+					drawBeziersToCanvas(
+						bezierPaths,
+						document.getElementById(`post-img-${fileName}`).getContext('2d'),
+						showPoints,
+					);
+				});
+			}
 		</script>
 		<style>
 			* {
@@ -130,8 +152,9 @@
 		</style>
 	</head>
 	<body>
-		<div id="target">
-			<h1>SVG to Bezier - test suite</h1>
-		</div>
+		<h1>SVG to Bezier - test suite</h1>
+		<label><input type="checkbox" id="show-path-points" checked /> Show path points</label>
+
+		<div id="target"></div>
 	</body>
 </html>
