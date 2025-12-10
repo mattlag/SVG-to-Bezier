@@ -4,6 +4,6 @@
   <ellipse cx="160" cy="130"  rx="50"   ry="0"  stroke="blue" fill="lightgray"/>
   <ellipse cx="NaN" cy="150"  rx="50"   ry="50" stroke="blue" fill="lightgray"/>
   <ellipse                              ry="50" stroke="blue" fill="lightgray"/>
-  <ellipse cx="110" cy="240"            ry="50" stroke="blue" fill="lightgray"/>
-  <ellipse cx="110" cy="240"                    stroke="blue" fill="lightgray"/>
+  <ellipse cx="110" cy="220"            ry="50" stroke="blue" fill="lightgray"/>
+  <ellipse cx="240" cy="240"                    stroke="blue" fill="lightgray"/>
 </svg>

@@ -13,7 +13,7 @@ export function tagConvertCircleEllipse(tagData) {
 	let cx = Number(data.cx) || 0;
 	let cy = Number(data.cy) || 0;
 
-	if(tagData.name === 'circle') {
+	if (tagData.name === 'circle') {
 		data.r = data.r || 0;
 		rx = Number(data.r) || 0;
 		ry = rx;
@@ -22,11 +22,11 @@ export function tagConvertCircleEllipse(tagData) {
 		rx = Number(data.rx);
 		ry = Number(data.ry);
 		// If one radius is missing, use the other
-		if(isNaN(rx) && !isNaN(ry)) rx = ry;
-		if(isNaN(ry) && !isNaN(rx)) ry = rx;
+		if (isNaN(rx) && !isNaN(ry)) rx = ry;
+		if (isNaN(ry) && !isNaN(rx)) ry = rx;
 		// If a radius is still NaN, set to zero
-		if(isNaN(rx)) rx = 0;
-		if(isNaN(ry)) ry = 0;
+		if (isNaN(rx)) rx = 0;
+		if (isNaN(ry)) ry = 0;
 	}
 
 	console.log('Converting Circle/Ellipse:', { cx, cy, rx, ry });
