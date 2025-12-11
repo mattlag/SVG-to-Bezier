@@ -29,8 +29,6 @@ export function tagConvertCircleEllipse(tagData) {
 		if (isNaN(ry)) ry = 0;
 	}
 
-	console.log('Converting Circle/Ellipse:', { cx, cy, rx, ry });
-
 	let ellipseMaxes = {
 		xMin: cx - rx,
 		xMax: cx + rx,

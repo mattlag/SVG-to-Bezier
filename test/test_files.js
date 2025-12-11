@@ -15,15 +15,16 @@ export const enabledTestCategories = {
 
 export const testFiles = [
 	{ category: 'Basic Shapes', name: 'shape_circle' },
-	{ category: 'Basic Shapes', name: 'shape_ellipse' },
+	{ category: 'Basic Shapes', name: 'shape_ellipse' }, 
 	{ category: 'Basic Shapes', name: 'shape_polygon' },
 	{ category: 'Basic Shapes', name: 'shape_polyline' },
 	{ category: 'Basic Shapes', name: 'shape_rect' },
+	{ category: 'Basic Shapes', name: 'shape_rect_radius' },
+	{ category: 'Multi-tag Shapes', name: 'shape_rect_multi' },
 	{ category: 'Multi-tag Shapes', name: 'shape_circle_multi' },
 	{ category: 'Multi-tag Shapes', name: 'shape_ellipse_multi' },
 	{ category: 'Multi-tag Shapes', name: 'shape_polygon_multi' },
 	{ category: 'Multi-tag Shapes', name: 'shape_polyline_multi' },
-	{ category: 'Multi-tag Shapes', name: 'shape_rect_multi' },
 	{ category: 'Path Commands', name: 'path_A' },
 	{ category: 'Path Commands', name: 'path_A2' },
 	{ category: 'Path Commands', name: 'path_Ar' },
