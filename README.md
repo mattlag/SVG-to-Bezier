@@ -9,6 +9,8 @@ SVG document in, and get a set of Bezier curves out. SVG has _a lot_ of features
 including things like colors, line weights, masks... many of these things do not really
 make sense if we're just wanting to extract Bezier curves out of some vector information.
 
+See the in-depth supported / not supported notes below.
+
 ## Quick Install
 
 ```sh
@@ -21,9 +23,13 @@ Then import and use in your project:
 import { SVGtoBezier } from 'svg-to-bezier';
 ```
 
-## What's supported
+# Support
 
-The following tags and attributes are supported. Default values are shown for attributes.
+## What is supported
+
+In general, this library supports all SVG tags in the [Shape Elements](https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Element#shape_elements) category (besides text and image). Also supported are tags from the [Structural Elements](https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Element#structural_elements) category.
+
+Default values are shown for attributes.
 
 - `<circle cx="0" cy="0" r="0">`
 - `<ellipse cx="0" cy="0" rx="0" ry="0">`
@@ -32,26 +38,42 @@ The following tags and attributes are supported. Default values are shown for at
 - `<polygon points="">`
 - `<polyline points="">`
 - `<rect x="0" y="0" rx="" ry="" width="0" height="0">`
+- `<use>` links are supported
 
-The `transform` and `transform-origin` attributes are also supported.
+On any tag, including the `<g>` tag, `transform` and `transform-origin` attributes are supported.
 
-Linking via `<use>` tags is supported.
-
-## Notable exceptions
+## Notes for supported tags and attributes
 
 Supported tags that exist within nested `<g>` tags will be processed, but the
 overall result will be 'flattened' / grouping will be lost.
-
-Many attributes in SVG, like `x`, `y`, `cx`, `cy`, `r`, `rx`, `ry`,
-`width`, and `height` can have value types of "length" or "percentage". Attributes
-in percentage format will cause the converter to fail.
 
 The `d` attribute in the `<path>` tag can get crazy complex (technically speaking)
 but one thing to note is the "Arc-to" commands `A` and `a` cannot be directly converted
 to Bezier curves with mathematical precision. A curve-fitting estimation is used to
 approximate the arc within a certain threshold. It is lossy.
 
-## Bezier Data Format
+## What's not supported
+
+### Attributes
+
+- Many attributes in SVG, like `x`, `y`, `cx`, `cy`, `r`, `rx`, `ry`,
+  `width`, and `height` can have value types of "length" or "percentage". Attributes
+  in percentage format will cause the converter to fail.
+- `pathLength` attribute is not supported (sometimes used to reduce a path to a certain length).
+- `viewBox` is ignored and cannot be used to move or crop objects.
+
+### Tags
+
+Unless specifically mentioned, no other tags are supported. There are other tags that are visual in nature that are worth pointing out specifically as _not_ supported:
+
+- `<pattern>`
+- `<mask>`
+- `<marker>`
+- `<text>`, `textPath>`, `tspan>`
+- `<foreignObject>`
+- `<image>`
+
+# Bezier Data Format
 
 The returned format will have it's roots in the 'standard' Bezier
 format, consisting of 4 x/y points. Since a single SVG document
