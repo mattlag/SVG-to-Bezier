@@ -69,7 +69,7 @@ Unless specifically mentioned, no other tags are supported. There are other tags
 - `<pattern>`
 - `<mask>`
 - `<marker>`
-- `<text>`, `textPath>`, `tspan>`
+- `<text>`, `textPath>`, `<tspan>`
 - `<foreignObject>`
 - `<image>`
 
