@@ -1,4 +1,25 @@
 {
 	"cSpell.words": ["Bezier", "Bézier", "Beziers", "Glyphr", "lightgray", "stylesheet"],
-	"svg.preview.background": "white"
+	"svg.preview.background": "white",
+	"livePreview.defaultPreviewPath": "/_test_suite.html",
+	"editor.defaultFormatter": "prettier.prettier-vscode",
+	"editor.formatOnSave": true,
+	"[javascript]": {
+		"editor.defaultFormatter": "prettier.prettier-vscode"
+	},
+	"[json]": {
+		"editor.defaultFormatter": "prettier.prettier-vscode"
+	},
+	"[jsonc]": {
+		"editor.defaultFormatter": "prettier.prettier-vscode"
+	},
+	"[html]": {
+		"editor.defaultFormatter": "prettier.prettier-vscode"
+	},
+	"[css]": {
+		"editor.defaultFormatter": "prettier.prettier-vscode"
+	},
+	"[markdown]": {
+		"editor.defaultFormatter": "prettier.prettier-vscode"
+	}
 }
