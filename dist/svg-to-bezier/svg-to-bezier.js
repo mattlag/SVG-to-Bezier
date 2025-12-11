@@ -2,7 +2,7 @@
 	SVG to Bezier
 	For more details, see: https://github.com/mattlag/SVG-to-Bezier
 	Also, more info on our 'Bezier Data Format' in bezier-data-format.md in this folder
-	Version: 2.2.0
+	Version: 2.3.0
 */
 
 import { tagConvertCircleEllipse } from './tag-convert-circle-ellipse.js';

@@ -8,25 +8,35 @@ import { roundAndSanitize } from './svg-to-bezier.js';
 export function tagConvertCircleEllipse(tagData) {
 	let bezierPath = [];
 	let data = tagData?.attributes || {};
+	let rx, ry;
 
-	let rx = Number(data.r) || Number(data.rx) || 100;
-	rx = Math.abs(rx);
-	let ry = Number(data.r) || Number(data.ry) || 100;
-	ry = Math.abs(ry);
 	let cx = Number(data.cx) || 0;
 	let cy = Number(data.cy) || 0;
 
-	if (!(rx === 0 && ry === 0)) {
-		let ellipseMaxes = {
-			xMin: cx - rx,
-			xMax: cx + rx,
-			yMin: cy - ry,
-			yMax: cy + ry,
-		};
-
-		bezierPath = ovalPathFromMaxes(ellipseMaxes);
+	if (tagData.name === 'circle') {
+		data.r = data.r || 0;
+		rx = Number(data.r) || 0;
+		ry = rx;
+	} else if (tagData.name === 'ellipse') {
+		// Parse data allowing for missing or NaN values
+		rx = Number(data.rx);
+		ry = Number(data.ry);
+		// If one radius is missing, use the other
+		if (isNaN(rx) && !isNaN(ry)) rx = ry;
+		if (isNaN(ry) && !isNaN(rx)) ry = rx;
+		// If a radius is still NaN, set to zero
+		if (isNaN(rx)) rx = 0;
+		if (isNaN(ry)) ry = 0;
 	}
 
+	let ellipseMaxes = {
+		xMin: cx - rx,
+		xMax: cx + rx,
+		yMin: cy - ry,
+		yMax: cy + ry,
+	};
+
+	bezierPath = ovalPathFromMaxes(ellipseMaxes);
 	return [bezierPath];
 }
 

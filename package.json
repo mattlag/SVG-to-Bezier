@@ -1,6 +1,6 @@
 {
 	"name": "svg-to-bezier",
-	"version": "2.2.0",
+	"version": "2.3.0",
 	"description": "Convert SVG shape tags to their cubic Bézier equivalent",
 	"type": "module",
 	"main": "./dist/svg-to-bezier/svg-to-bezier.js",
