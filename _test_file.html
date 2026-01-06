@@ -26,9 +26,10 @@
 			}
 
 			function handleDragLeave() {
-				document.getElementById('input-code').innerHTML = 'Drag + Drop a file here';
+				document.getElementById('input-code').innerHTML = 'Paste code, or drop a file here';
 			}
 
+			document.getElementById('input-code').addEventListener('dragenter', handleDragEnter);
 			document.getElementById('input-code').addEventListener('paste', handleCodePaste);
 			document.getElementById('input-code').addEventListener('change', handleCodePaste);
 
@@ -63,6 +64,7 @@
 				redrawCanvas(currentBezierPaths);
 
 				const showPoints = document.getElementById('show-path-points')?.checked ?? true;
+				let canvas = document.getElementById('output-canvas');
 				drawBeziersToCanvas(currentBezierPaths, canvas.getContext('2d'), showPoints);
 				let output = JSON.stringify(currentBezierPaths);
 				output = output.replaceAll('],', '],\n');
@@ -120,7 +122,7 @@
 				row-gap: 20px;
 				column-gap: 20px;
 				grid-template-columns: 1fr 1fr;
-				grid-template-rows: min-content min-content min-content 1fr 1fr max-content;
+				grid-template-rows: min-content min-content min-content 1fr 1fr;
 			}
 
 			h1,
@@ -157,7 +159,7 @@
 		<label><input type="checkbox" id="show-path-points" checked /> Show path points</label>
 		<h3>input</h3>
 		<h3>output</h3>
-		<textarea id="input-code">Drag + Drop a file here</textarea>
+		<textarea id="input-code">Paste code, or drop a file here</textarea>
 		<textarea id="output-code"></textarea>
 		<div id="input-svg"></div>
 		<canvas id="output-canvas"></canvas>
